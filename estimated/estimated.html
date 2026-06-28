@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+
+<html lang="uz"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Grand Horizon - Band qilish kalendari</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 20;
+        }
+        .today-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #ba1a1a; /* error color */
+            z-index: 25;
+            pointer-events: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#d9e3f4",
+                        "surface-bright": "#f9f9ff",
+                        "secondary": "#555f6d",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#596372",
+                        "surface-dim": "#d3daef",
+                        "inverse-on-surface": "#edf0ff",
+                        "inverse-primary": "#b5c4ff",
+                        "primary-fixed-dim": "#b5c4ff",
+                        "surface-container-low": "#f1f3ff",
+                        "primary": "#003fb1",
+                        "on-secondary-fixed": "#121c28",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#dbdee1",
+                        "surface-variant": "#dce2f7",
+                        "tertiary-fixed-dim": "#c4c7ca",
+                        "outline": "#737686",
+                        "surface-container-high": "#e1e8fd",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#dbe1ff",
+                        "primary-container": "#1a56db",
+                        "tertiary-fixed": "#e0e2e6",
+                        "on-primary-fixed-variant": "#003dab",
+                        "outline-variant": "#c3c5d7",
+                        "on-tertiary-fixed": "#191c1f",
+                        "inverse-surface": "#293040",
+                        "on-tertiary-fixed-variant": "#44474a",
+                        "on-surface": "#141b2b",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#d6e0f1",
+                        "on-secondary": "#ffffff",
+                        "on-surface-variant": "#434654",
+                        "secondary-fixed-dim": "#bdc7d8",
+                        "on-background": "#141b2b",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#dce2f7",
+                        "surface-tint": "#1353d8",
+                        "tertiary-container": "#5f6265",
+                        "on-primary-fixed": "#00174d",
+                        "background": "#f9f9ff",
+                        "on-secondary-fixed-variant": "#3e4755",
+                        "surface-container": "#e9edff",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#474a4d",
+                        "on-primary-container": "#d4dcff",
+                        "surface": "#f9f9ff"
+                    },
+                    "spacing": {
+                        "gutter": "20px", "xl": "32px", "lg": "24px", "xs": "4px", "sm": "8px", "margin-page": "40px", "unit": "4px", "md": "16px"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface overflow-hidden">
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-outline-variant flex flex-col gap-2 p-md z-50">
+<div class="flex items-center gap-3 px-2 mb-6">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">apartment</span>
+</div>
+<div>
+<h1 class="text-headline-md font-bold text-on-surface leading-tight">Grand Horizon</h1>
+<p class="text-label-md text-on-surface-variant">Reception Desk</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 p-3 bg-secondary-container text-on-secondary-container font-medium rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-body-md">Bookings</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">bed</span>
+<span class="font-body-md">Rooms</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md">Guests</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md">Payments</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">cleaning_services</span>
+<span class="font-body-md">Housekeeping</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto p-4 bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full border-2 border-white" data-alt="A professional headshot of a friendly hotel receptionist in a clean, navy blue uniform, captured in a bright and airy lobby with soft morning light filtering through large glass windows. The image has a premium, modern feel with clear focus and high-end enterprise aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUN3V1UNlozaXO4juOYZ7vVi-LfwR2AZK5XtQj_XxUlj0Xh2vZncYMs1rFNNLSENfaiOxt6B2J8j8G7BPUjiKirlgCrPgs7tbPenpfqNVgIWJHP_ACRtqeY7Sjhjyw1U8xMBoPXV01T-oMGy16q6OcgtPR5qI7NCGc_rgc8uObHapeYJWMfgCHMps6a-UkXFuoexiwLPCFp5UMCshMn6jUxviDHBPVRBuiUx-jUgmQU1yEJXBhw0u2E0LA7LixAxr7IDUHSG8hAFVV"/>
+<div>
+<p class="text-body-md font-bold text-on-surface">Alisher V.</p>
+<p class="text-label-md text-on-surface-variant">Administrator</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="ml-[280px] h-screen flex flex-col overflow-hidden bg-background">
+<header class="flex-shrink-0 flex justify-between items-center h-16 px-lg bg-surface border-b border-outline-variant z-40">
+<div class="flex items-center gap-4">
+<h2 class="text-headline-md font-bold text-primary">Hotel PMS</h2>
+<div class="relative w-72">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-body-md focus:ring-2 focus:ring-primary/20" placeholder="Qidiruv..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-transform active:scale-90">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-transform active:scale-90">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-transform active:scale-90">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<section class="flex-shrink-0 px-lg py-md flex items-center justify-between bg-surface border-b border-outline-variant z-30">
+<div>
+<h1 class="text-headline-lg font-bold text-on-surface">Band qilish kalendari</h1>
+<p class="text-body-md text-on-surface-variant">Oktyabr, 2024</p>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex bg-surface-container rounded-lg p-1">
+<button class="px-4 py-1.5 text-label-md font-medium bg-white rounded shadow-sm text-primary">Oy</button>
+<button class="px-4 py-1.5 text-label-md font-medium text-on-surface-variant hover:text-on-surface">Hafta</button>
+<button class="px-4 py-1.5 text-label-md font-medium text-on-surface-variant hover:text-on-surface">Kun</button>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<button class="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-lg text-body-md font-medium hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                Filtr
+            </button>
+<button class="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg text-body-md font-semibold hover:bg-primary-container transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Yangi band qilish
+            </button>
+</div>
+</section>
+<section class="flex-1 overflow-auto bg-surface-container-lowest relative hide-scrollbar pb-20">
+<div class="min-w-max relative" id="calendar-container">
+<!-- Sticky Header Row -->
+<div class="sticky top-0 z-40 flex bg-white border-b border-outline-variant w-max shadow-sm">
+<div class="w-[200px] flex-shrink-0 h-16 border-r border-outline-variant flex items-center px-lg bg-surface-container-low sticky left-0 z-50">
+<span class="text-label-md font-bold text-on-surface-variant uppercase tracking-wider">Xonalar</span>
+</div>
+<div class="flex h-16 bg-white" id="header-days">
+<!-- Days will be generated by script -->
+</div>
+</div>
+<!-- Today Indicator Line -->
+<div class="today-line" style="left: calc(200px + (2 * 120px) + 60px);"></div>
+<!-- Rows Container -->
+<div class="flex flex-col w-max" id="calendar-rows">
+<!-- Row 1 -->
+<div class="flex h-[72px] border-b border-outline-variant bg-white w-max group hover:bg-surface-container-low/50 transition-colors">
+<div class="w-[200px] flex-shrink-0 h-[72px] border-r border-outline-variant flex flex-col justify-center px-lg bg-white sticky left-0 z-30 group-hover:bg-surface-container-low/50 transition-colors">
+<span class="text-body-md font-bold text-on-surface">101</span>
+<span class="text-label-md text-on-surface-variant">Deluxe King</span>
+</div>
+<div class="flex relative flex-1" style="width: calc(31 * 120px);">
+<div class="absolute inset-0 flex pointer-events-none row-grid-bg"></div>
+<!-- Booking Bar -->
+<div class="absolute left-[40px] top-3 h-12 w-[320px] bg-primary/90 text-white rounded-xl shadow-sm flex items-center px-4 gap-3 cursor-pointer hover:scale-[1.02] transition-transform z-10">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div class="overflow-hidden">
+<p class="text-body-md font-semibold truncate">Anvar Soliyev</p>
+<p class="text-[10px] opacity-80">Confirmed • Oct 1-3</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="flex h-[72px] border-b border-outline-variant bg-white w-max group hover:bg-surface-container-low/50 transition-colors">
+<div class="w-[200px] flex-shrink-0 h-[72px] border-r border-outline-variant flex flex-col justify-center px-lg bg-white sticky left-0 z-30 group-hover:bg-surface-container-low/50 transition-colors">
+<span class="text-body-md font-bold text-on-surface">102</span>
+<span class="text-label-md text-on-surface-variant">Standard Twin</span>
+</div>
+<div class="flex relative flex-1" style="width: calc(31 * 120px);">
+<div class="absolute inset-0 flex pointer-events-none row-grid-bg"></div>
+<div class="absolute left-[280px] top-3 h-12 w-[480px] bg-green-600 text-white rounded-xl shadow-sm flex items-center px-4 gap-3 cursor-pointer hover:scale-[1.02] transition-transform z-10">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">meeting_room</span>
+<div class="overflow-hidden">
+<p class="text-body-md font-semibold truncate">Jasur Hamidov</p>
+<p class="text-[10px] opacity-80">In-House • Oct 3-7</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="flex h-[72px] border-b border-outline-variant bg-white w-max group hover:bg-surface-container-low/50 transition-colors">
+<div class="w-[200px] flex-shrink-0 h-[72px] border-r border-outline-variant flex flex-col justify-center px-lg bg-white sticky left-0 z-30 group-hover:bg-surface-container-low/50 transition-colors">
+<span class="text-body-md font-bold text-on-surface">103</span>
+<span class="text-label-md text-on-surface-variant">Standard Twin</span>
+</div>
+<div class="flex relative flex-1" style="width: calc(31 * 120px);">
+<div class="absolute inset-0 flex pointer-events-none row-grid-bg"></div>
+<div class="absolute left-[120px] top-3 h-12 w-[240px] bg-amber-400 text-on-surface font-medium rounded-xl shadow-sm flex items-center px-4 gap-3 cursor-pointer hover:scale-[1.02] transition-transform z-10">
+<span class="material-symbols-outlined text-[20px]">pending_actions</span>
+<div class="overflow-hidden">
+<p class="text-body-md font-semibold truncate">Nigora Akromova</p>
+<p class="text-[10px] opacity-80 text-on-surface-variant">Pending • Oct 2-4</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="flex h-[72px] border-b border-outline-variant bg-white w-max group hover:bg-surface-container-low/50 transition-colors">
+<div class="w-[200px] flex-shrink-0 h-[72px] border-r border-outline-variant flex flex-col justify-center px-lg bg-white sticky left-0 z-30 group-hover:bg-surface-container-low/50 transition-colors">
+<span class="text-body-md font-bold text-on-surface">201</span>
+<span class="text-label-md text-on-surface-variant">Suite King</span>
+</div>
+<div class="flex relative flex-1" style="width: calc(31 * 120px);">
+<div class="absolute inset-0 flex pointer-events-none row-grid-bg"></div>
+</div>
+</div>
+<!-- Row 5 -->
+<div class="flex h-[72px] border-b border-outline-variant bg-white w-max group hover:bg-surface-container-low/50 transition-colors">
+<div class="w-[200px] flex-shrink-0 h-[72px] border-r border-outline-variant flex flex-col justify-center px-lg bg-white sticky left-0 z-30 group-hover:bg-surface-container-low/50 transition-colors">
+<span class="text-body-md font-bold text-on-surface">202</span>
+<span class="text-label-md text-on-surface-variant">Deluxe Twin</span>
+</div>
+<div class="flex relative flex-1" style="width: calc(31 * 120px);">
+<div class="absolute inset-0 flex pointer-events-none row-grid-bg"></div>
+<div class="absolute left-[420px] top-3 h-12 w-[360px] bg-primary/90 text-white rounded-xl shadow-sm flex items-center px-4 gap-3 cursor-pointer hover:scale-[1.02] transition-transform z-10">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div class="overflow-hidden">
+<p class="text-body-md font-semibold truncate">Daler Islomov</p>
+<p class="text-[10px] opacity-80">Confirmed • Oct 4-7</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<footer class="absolute bottom-0 right-0 w-[calc(100%-280px)] bg-surface-container-lowest border-t border-outline-variant shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] flex justify-end items-center gap-md px-xl py-md z-50">
+<button class="flex items-center gap-2 px-4 py-2 text-secondary hover:bg-surface-variant transition-all duration-300 rounded-lg">
+<span class="material-symbols-outlined text-[18px]">save</span>
+<span class="font-label-md text-label-md">Save Draft</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 text-secondary hover:bg-surface-variant transition-all duration-300 rounded-lg">
+<span class="material-symbols-outlined text-[18px]">print</span>
+<span class="font-label-md text-label-md">Print</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 text-secondary hover:bg-surface-variant transition-all duration-300 rounded-lg">
+<span class="material-symbols-outlined text-[18px]">close</span>
+<span class="font-label-md text-label-md">Cancel</span>
+</button>
+<button class="flex items-center gap-2 bg-primary text-on-primary rounded-full px-6 py-2.5 font-bold shadow-md hover:scale-105 transition-all duration-300">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span class="font-label-md text-label-md">Confirm</span>
+</button>
+</footer>
+</main>
+<script>
+    // Dynamic Header & Grid Background Generation
+    const days = ['Yak', 'Dush', 'Sesh', 'Chor', 'Pay', 'Jum', 'Shan'];
+    const headerContainer = document.getElementById('header-days');
+    const gridBgContainers = document.querySelectorAll('.row-grid-bg');
+    
+    // October 2024 (starts on Tuesday)
+    // 1st is Tuesday (Sesh)
+    
+    let headerHTML = '';
+    let gridBgHTML = '';
+
+    for (let i = 1; i <= 31; i++) {
+        // Oct 1 2024 is Tuesday (index 2 in JS date assuming 0=Sunday)
+        const dateObj = new Date(2024, 9, i); 
+        const dayName = days[dateObj.getDay()];
+        const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+        const isToday = i === 3; // Example today
+
+        // Build Header Cell
+        headerHTML += `
+            <div class="w-[120px] flex-shrink-0 border-r border-outline-variant flex flex-col items-center justify-center ${isToday ? 'bg-primary/5' : (isWeekend ? 'bg-surface-container-low' : '')}">
+                <span class="text-label-md font-medium ${isToday ? 'text-primary' : (isWeekend ? 'text-error/70' : 'text-on-surface-variant')}">${dayName}</span>
+                <span class="text-headline-md font-bold ${isToday ? 'text-primary' : (isWeekend ? 'text-error' : 'text-on-surface')}">${i < 10 ? '0' + i : i}</span>
+            </div>
+        `;
+
+        // Build Grid Cell Background
+        gridBgHTML += `
+            <div class="w-[120px] flex-shrink-0 border-r border-outline-variant h-full ${isToday ? 'bg-primary/5' : (isWeekend ? 'bg-surface-container-low/30' : '')}"></div>
+        `;
+    }
+
+    headerContainer.innerHTML = headerHTML;
+    gridBgContainers.forEach(container => {
+        container.innerHTML = gridBgHTML;
+    });
+
+    // Simple Micro-interaction for calendar drag
+    const scrollContainer = document.querySelector('section.flex-1');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+    let startY;
+    let scrollTop;
+
+    scrollContainer.addEventListener('mousedown', (e) => {
+        // Don't drag if clicking on a booking bar
+        if(e.target.closest('.cursor-pointer')) return;
+        
+        isDown = true;
+        scrollContainer.classList.add('cursor-grabbing');
+        startX = e.pageX - scrollContainer.offsetLeft;
+        startY = e.pageY - scrollContainer.offsetTop;
+        scrollLeft = scrollContainer.scrollLeft;
+        scrollTop = scrollContainer.scrollTop;
+    });
+    scrollContainer.addEventListener('mouseleave', () => {
+        isDown = false;
+        scrollContainer.classList.remove('cursor-grabbing');
+    });
+    scrollContainer.addEventListener('mouseup', () => {
+        isDown = false;
+        scrollContainer.classList.remove('cursor-grabbing');
+    });
+    scrollContainer.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - scrollContainer.offsetLeft;
+        const y = e.pageY - scrollContainer.offsetTop;
+        const walkX = (x - startX) * 1.5;
+        const walkY = (y - startY) * 1.5;
+        scrollContainer.scrollLeft = scrollLeft - walkX;
+        scrollContainer.scrollTop = scrollTop - walkY;
+    });
+</script>
+</body></html>
