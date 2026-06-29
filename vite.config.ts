@@ -16,10 +16,6 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
       },
     },
-    define: {
-      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || '/api/v1'),
-      'import.meta.env.VITE_API_BASE': JSON.stringify(env.VITE_API_BASE || 'http://localhost:8000'),
-    },
     server: {
       port,
       proxy: isDev ? {
