@@ -1,8 +1,13 @@
 import axios, { type InternalAxiosRequestConfig } from "axios"
 import { useAuthStore } from "@/store/auth"
 
+const apiUrl = import.meta.env.VITE_API_URL || "/api/v1"
+const apiBase = import.meta.env.VITE_API_BASE || ""
+
+const baseURL = import.meta.env.DEV ? apiUrl : `${apiBase}${apiUrl}`
+
 const api = axios.create({
-  baseURL: "/api/v1",
+  baseURL,
   headers: { "Content-Type": "application/json" },
 })
 
