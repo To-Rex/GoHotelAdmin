@@ -26,6 +26,7 @@ import {
   deleteHotelService as deleteHotelServiceApi,
 } from "@/api/modules/services"
 import { getHotels } from "@/api/modules/hotels"
+import type { Hotel } from "@/types/hotel"
 import type {
   Service,
   ServiceCreateRequest,
@@ -199,11 +200,11 @@ export function ServicesPage() {
   const hotelTree = useMemo(() => {
     if (!isSuperAdmin) return []
     return hotelsList
-      .map((hotel: any) => {
+      .map((hotel: Hotel) => {
         const hotelSvcs = hotelServices.filter((hs) => hs.hotel_id === hotel.id)
         return { hotel, services: hotelSvcs }
       })
-      .filter((item) => item.services.length > 0)
+      .filter((item: { hotel: Hotel; services: HotelService[] }) => item.services.length > 0)
   }, [hotelsList, hotelServices, isSuperAdmin])
 
   const toggleHotel = (id: string) => {
@@ -318,7 +319,7 @@ export function ServicesPage() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {hotelTree.map(({ hotel, services: hotelSvcs }) => {
+                  {hotelTree.map(({ hotel, services: hotelSvcs }: { hotel: Hotel; services: HotelService[] }) => {
                     const isExpanded = expandedHotels.has(hotel.id)
 
                     return (
@@ -363,7 +364,7 @@ export function ServicesPage() {
                               <span className="col-span-2">{t("services.active")}</span>
                               <span className="col-span-4" />
                             </div>
-                            {hotelSvcs.map((hs) => (
+                            {hotelSvcs.map((hs: HotelService) => (
                               <div
                                 key={hs.id}
                                 className="grid grid-cols-12 gap-2 px-3 py-2 rounded-md items-center hover:bg-gray-50 transition-colors"

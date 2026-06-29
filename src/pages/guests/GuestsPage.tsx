@@ -82,7 +82,7 @@ export function GuestsPage() {
       : undefined
 
   const createMutation = useMutation({
-    mutationFn: createGuest,
+    mutationFn: (data: GuestCreateRequest) => createGuest(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["guests"] })
       setModalOpen(false)

@@ -166,7 +166,7 @@ export function ReservationsPage() {
   }
 
   const createMutation = useMutation({
-    mutationFn: createReservation,
+    mutationFn: (data: ReservationCreateRequest) => createReservation(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reservations"] })
       setModalOpen(false)

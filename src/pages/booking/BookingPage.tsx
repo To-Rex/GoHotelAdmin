@@ -333,7 +333,7 @@ export function BookingPage() {
         {
           hotel_id: values.hotel_id,
           branch_id: values.branch_id,
-          guest_id: guestId,
+          guest_id: guestId || "",
           room_id: values.room_id,
           check_in_date: values.check_in_date,
           check_out_date: values.check_out_date,
