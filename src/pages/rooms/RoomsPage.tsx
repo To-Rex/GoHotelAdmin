@@ -598,36 +598,25 @@ export function RoomsPage() {
         title={editingRoom ? t("rooms.editRoom") : t("rooms.createRoom")}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            {isSuperAdmin ? (
-              <Select
-                id="hotel_id"
-                label="Mehmonxona *"
-                options={hotelOptions}
-                placeholder={t("rooms.selectHotel")}
-                error={errors.hotel_id?.message}
-                {...register("hotel_id")}
-              />
-            ) : (
-              <Input
-                id="hotel_id"
-                label="Mehmonxona *"
-                placeholder={t("rooms.uuid")}
-                error={errors.hotel_id?.message}
-                disabled
-                {...register("hotel_id")}
-              />
-            )}
+          {isSuperAdmin && (
             <Select
-              id="branch_id"
-              label="Filial *"
-              options={branchOptions}
-              placeholder={t("rooms.selectBranch")}
-              error={errors.branch_id?.message}
-              disabled={!isSuperAdmin && !!branchId}
-              {...register("branch_id")}
+              id="hotel_id"
+              label="Mehmonxona *"
+              options={hotelOptions}
+              placeholder={t("rooms.selectHotel")}
+              error={errors.hotel_id?.message}
+              {...register("hotel_id")}
             />
-          </div>
+          )}
+          <Select
+            id="branch_id"
+            label="Filial *"
+            options={branchOptions}
+            placeholder={t("rooms.selectBranch")}
+            error={errors.branch_id?.message}
+            disabled={!isSuperAdmin && !!branchId}
+            {...register("branch_id")}
+          />
 
           <div className="grid grid-cols-2 gap-4">
             <Input

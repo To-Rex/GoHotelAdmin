@@ -27,7 +27,7 @@ import {
   isToday,
 } from "date-fns"
 import { getReservations, createReservation } from "@/api/modules/reservations"
-import { getRooms } from "@/api/modules/rooms"
+import { getRooms, getRoomTypes } from "@/api/modules/rooms"
 import { getGuests, createGuest } from "@/api/modules/guests"
 import { Button, Input, Modal, Spinner } from "@/components/ui"
 import { useScope } from "@/hooks/useScope"
@@ -94,6 +94,11 @@ export function BookingPage() {
     queryFn: () => getGuests(scopeMerge({ page_size: "500" })),
   })
 
+  const { data: roomTypesData } = useQuery({
+    queryKey: ["roomTypes"],
+    queryFn: getRoomTypes,
+  })
+
   const rooms: Room[] = useMemo(() => {
     if (!roomsData) return []
     if (Array.isArray(roomsData)) return roomsData as Room[]
@@ -111,6 +116,27 @@ export function BookingPage() {
     if (Array.isArray(guestsData)) return guestsData as Guest[]
     return (guestsData as PaginatedResponse<Guest>)?.items ?? []
   }, [guestsData])
+
+  const priceMap = useMemo(() => {
+    const map: Record<string, number> = {}
+    if (!roomTypesData) return map
+    const types: { id: string; base_price: number }[] = Array.isArray(roomTypesData)
+      ? roomTypesData as { id: string; base_price: number }[]
+      : []
+    for (const rt of types) {
+      map[rt.id] = rt.base_price ?? 0
+    }
+    return map
+  }, [roomTypesData])
+
+  const getRoomPrice = useCallback(
+    (room: Room): number => {
+      if (room.base_price && room.base_price > 0) return room.base_price
+      if (room.room_type_id && priceMap[room.room_type_id]) return priceMap[room.room_type_id]
+      return 0
+    },
+    [priceMap]
+  )
 
   const filteredGuests = useMemo(() => {
     let list = guests
@@ -323,7 +349,7 @@ export function BookingPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reservations"] })
       queryClient.invalidateQueries({ queryKey: ["rooms"] })
-      queryClient.invalidateQueries({ queryKey: ["guests"] })
+      queryClient.removeQueries({ queryKey: ["guests"] })
       setModalOpen(false)
       setSelectedRoom(null)
       setSelectionStart(null)
@@ -349,7 +375,7 @@ export function BookingPage() {
       ? dayDiff(selectionStart, selectionEnd) + 1
       : 0
 
-  const roomPrice = selectedRoom?.base_price ?? 0
+  const roomPrice = selectedRoom ? getRoomPrice(selectedRoom) : 0
   const totalPrice = nightCount * roomPrice
 
   const calendarWidth = days.length * DAY_WIDTH
@@ -381,12 +407,8 @@ export function BookingPage() {
               <span>{selectionStart} → {selectionEnd}</span>
               <span>·</span>
               <span>{nightCount} {t("reservations.dates")?.toLowerCase() || "kun"}</span>
-              {roomPrice > 0 && (
-                <>
-                  <span>·</span>
-                  <span className="font-medium text-primary-700">{totalPrice.toLocaleString()} so'm</span>
-                </>
-              )}
+              <span>·</span>
+              <span className="font-medium text-primary-700">{totalPrice.toLocaleString()} so'm</span>
               <button
                 onClick={clearSelection}
                 className="ml-2 p-0.5 rounded hover:bg-gray-200 text-gray-400 hover:text-gray-600"
@@ -499,6 +521,11 @@ export function BookingPage() {
                     <span className="text-xs text-gray-400 truncate">
                       {room.room_type?.name || ""}
                     </span>
+                    {getRoomPrice(room) > 0 && (
+                      <span className="text-[10px] text-primary-600 font-medium">
+                        {getRoomPrice(room).toLocaleString()} so'm
+                      </span>
+                    )}
                   </div>
 
                   {/* Day cells */}
@@ -817,42 +844,40 @@ export function BookingPage() {
             {...register("notes")}
           />
 
-          {totalPrice > 0 && (
-            <div className="p-3 bg-gray-50 rounded-lg space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Xona narxi ({nightCount} kun)</span>
-                <span className="text-sm font-semibold text-gray-900">{totalPrice.toLocaleString()} so'm</span>
-              </div>
-              <div className="border-t border-gray-200 pt-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  To'lov summasi
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <Input
-                    id="payment_amount"
-                    label=""
-                    type="number"
-                    min={0}
-                    max={totalPrice}
-                    placeholder="0"
-                    {...register("payment_amount", { valueAsNumber: true })}
-                  />
-                  <select
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    {...register("payment_method")}
-                  >
-                    <option value="">To'lov turi...</option>
-                    <option value="CASH">Naqd</option>
-                    <option value="CREDIT_CARD">Kredit karta</option>
-                    <option value="DEBIT_CARD">Debet karta</option>
-                    <option value="BANK_TRANSFER">Bank o'tkazmasi</option>
-                    <option value="MOBILE_PAYMENT">Mobil to'lov</option>
-                    <option value="ONLINE">Online</option>
-                  </select>
-                </div>
+          <div className="p-3 bg-gray-50 rounded-lg space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Xona narxi ({nightCount} kun)</span>
+              <span className="text-sm font-semibold text-gray-900">{totalPrice.toLocaleString()} so'm</span>
+            </div>
+            <div className="border-t border-gray-200 pt-3">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                To'lov summasi
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  id="payment_amount"
+                  label=""
+                  type="number"
+                  min={0}
+                  max={totalPrice}
+                  placeholder="0"
+                  {...register("payment_amount", { valueAsNumber: true })}
+                />
+                <select
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  {...register("payment_method")}
+                >
+                  <option value="">To'lov turi...</option>
+                  <option value="CASH">Naqd</option>
+                  <option value="CREDIT_CARD">Kredit karta</option>
+                  <option value="DEBIT_CARD">Debet karta</option>
+                  <option value="BANK_TRANSFER">Bank o'tkazmasi</option>
+                  <option value="MOBILE_PAYMENT">Mobil to'lov</option>
+                  <option value="ONLINE">Online</option>
+                </select>
               </div>
             </div>
-          )}
+          </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
             <Button

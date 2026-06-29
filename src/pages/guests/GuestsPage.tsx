@@ -57,7 +57,7 @@ export function GuestsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["guests", search, page],
     queryFn: () => {
-      const params: Record<string, string> = { page: String(page), page_size: "10" }
+      const params: Record<string, string> = { page: String(page), page_size: "20" }
       if (search) params.search = search
       return getGuests(scopeMerge(params))
     },
