@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
   const port = parseInt(env.VITE_PORT || '5173', 10)
-  const apiBase = env.VITE_API_BASE || 'http://localhost:8000'
+  const isDev = mode === 'development'
 
   return {
     plugins: [react(), tailwindcss()],
@@ -16,14 +16,18 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
       },
     },
+    define: {
+      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || '/api/v1'),
+      'import.meta.env.VITE_API_BASE': JSON.stringify(env.VITE_API_BASE || 'http://localhost:8000'),
+    },
     server: {
       port,
-      proxy: {
+      proxy: isDev ? {
         '/api': {
-          target: apiBase,
+          target: 'http://localhost:8000',
           changeOrigin: true,
         },
-      },
+      } : undefined,
     },
     preview: {
       port: parseInt(env.VITE_PORT || '5173', 10),
