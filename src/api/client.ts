@@ -2,10 +2,9 @@ import axios, { type InternalAxiosRequestConfig } from "axios"
 import { useAuthStore } from "@/store/auth"
 
 const API_URL = "/api/v1"
-const PROD_BACKEND = "https://gohotel-gohotel-backend-h8enwu-d507a0-13-140-185-49.sslip.io"
 
 const api = axios.create({
-  baseURL: import.meta.env.PROD ? `${PROD_BACKEND}${API_URL}` : API_URL,
+  baseURL: import.meta.env.PROD ? `${import.meta.env.VITE_API_BASE}${API_URL}` : API_URL,
   headers: { "Content-Type": "application/json" },
 })
 
