@@ -19,6 +19,7 @@ export type ReservationStatus =
   | "NO_SHOW"
 export type HousekeepingTaskType =
   | "CLEANING"
+  | "DEEP_CLEANING"
   | "MAINTENANCE"
   | "INSPECTION"
   | "TURN_DOWN"

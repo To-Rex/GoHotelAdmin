@@ -12,6 +12,7 @@ const statusStyles: Record<string, string> = {
   RESERVED: "bg-blue-100 text-blue-800",
   OCCUPIED: "bg-purple-100 text-purple-800",
   CLEANING: "bg-orange-100 text-orange-800",
+  DEEP_CLEANING: "bg-red-100 text-red-800",
   MAINTENANCE: "bg-yellow-100 text-yellow-800",
   OUT_OF_SERVICE: "bg-red-100 text-red-800",
   INSPECTION: "bg-cyan-100 text-cyan-800",

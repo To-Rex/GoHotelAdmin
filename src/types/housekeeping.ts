@@ -20,13 +20,14 @@ export interface HousekeepingTask {
   created_by: string | null
   created_at: string
   updated_at: string
+  photo_count: number
   room?: { id: string; room_number: string }
   assigned_user?: { id: string; first_name: string; last_name: string }
   branch?: { id: string; name: string }
 }
 
 export interface HousekeepingTaskCreateRequest {
-  hotel_id: string
+  hotel_id?: string
   branch_id: string
   room_id: string
   task_type: HousekeepingTaskType
@@ -51,4 +52,14 @@ export interface HousekeepingStatusUpdate {
 
 export interface HousekeepingAssignRequest {
   assigned_to: string
+}
+
+export interface TaskPhoto {
+  id: string
+  file_name: string
+  mime_type: string
+  file_size: number
+  uploaded_by: string
+  created_at: string | null
+  download_url: string
 }

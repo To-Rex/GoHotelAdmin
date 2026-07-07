@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Plus, ChevronDown, ChevronRight, Search, X, Building2, DoorOpen, Brush } from "lucide-react"
+import { useState, useMemo, useEffect, useRef } from "react"
+import { useQuery, useMutation, useQueryClient, useIsFetching } from "@tanstack/react-query"
+import { Plus, ChevronDown, ChevronRight, Search, X, Building2, DoorOpen, Brush, Image as ImageIcon, RefreshCw } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import api from "@/api/client"
 import {
   Button,
   Input,
@@ -19,29 +20,64 @@ import {
   updateHousekeepingTask,
   updateHousekeepingTaskStatus,
   assignHousekeepingTask,
+  getTaskPhotos,
 } from "@/api/modules/housekeeping"
-import type { HousekeepingTask, HousekeepingTaskCreateRequest } from "@/types/housekeeping"
+import type { HousekeepingTask, HousekeepingTaskCreateRequest, TaskPhoto } from "@/types/housekeeping"
 import { getHotels } from "@/api/modules/hotels"
 import { getBranches } from "@/api/modules/branches"
+import { getRooms } from "@/api/modules/rooms"
+import { getEmployees } from "@/api/modules/employees"
 import { formatDate, cn } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { useScope } from "@/hooks/useScope"
+
+function PhotoImage({ taskId, photoId, fileName }: { taskId: string; photoId: string; fileName: string }) {
+  const [src, setSrc] = useState<string | null>(null)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    const url = `/tasks/${taskId}/photos/${photoId}/view`
+    api.get(url, { responseType: "blob" })
+      .then((res) => {
+        if (!cancelled) {
+          setSrc(URL.createObjectURL(res.data))
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError(true)
+      })
+    return () => { cancelled = true }
+  }, [taskId, photoId])
+
+  if (error) return <div className="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">{fileName}</div>
+  if (!src) return <div className="w-full h-40 bg-gray-50 animate-pulse" />
+  return <img src={src} alt={fileName} className="w-full h-40 object-cover" />
+}
 
 export function HousekeepingPage() {
   const { t } = useTranslation()
   const { scopeMerge, isSuperAdmin, hotelId, branchId } = useScope()
   const queryClient = useQueryClient()
+  const isFetching = useIsFetching({ queryKey: ["housekeeping"] }) > 0
   const [search, setSearch] = useState("")
   const [expandedHotels, setExpandedHotels] = useState<Set<string>>(new Set())
   const [expandedBranches, setExpandedBranches] = useState<Set<string>>(new Set())
   const [modalOpen, setModalOpen] = useState(false)
   const [assignModal, setAssignModal] = useState<HousekeepingTask | null>(null)
+  const [photoModal, setPhotoModal] = useState<HousekeepingTask | null>(null)
+
+  const { data: taskPhotos, isLoading: photosLoading } = useQuery({
+    queryKey: ["task-photos", photoModal?.id],
+    queryFn: () => getTaskPhotos(photoModal!.id, { hotel_id: photoModal!.hotel_id }),
+    enabled: !!photoModal,
+  })
 
   const taskSchema = z.object({
     hotel_id: z.string().min(1, t("housekeeping.hotelRequired")),
     branch_id: z.string().min(1, t("housekeeping.branchRequired")),
     room_id: z.string().min(1, t("housekeeping.roomRequired")),
-    task_type: z.enum(["CLEANING", "MAINTENANCE", "INSPECTION", "TURN_DOWN"]),
+    task_type: z.enum(["CLEANING", "DEEP_CLEANING", "MAINTENANCE", "INSPECTION", "TURN_DOWN"]),
     priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]),
     assigned_to: z.string().optional(),
     notes: z.string().optional(),
@@ -167,11 +203,58 @@ export function HousekeepingPage() {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<TaskForm>({
     resolver: zodResolver(taskSchema),
     defaultValues: { task_type: "CLEANING", priority: "MEDIUM" },
   })
+
+  const watchedHotelId = watch("hotel_id")
+  const watchedBranchId = watch("branch_id")
+  const prevHotelId = useRef(watchedHotelId)
+  const prevBranchId = useRef(watchedBranchId)
+
+  useEffect(() => {
+    if (prevHotelId.current && watchedHotelId && prevHotelId.current !== watchedHotelId) {
+      setValue("branch_id", "")
+      setValue("room_id", "")
+    }
+    prevHotelId.current = watchedHotelId
+  }, [watchedHotelId, setValue])
+
+  useEffect(() => {
+    if (prevBranchId.current && watchedBranchId && prevBranchId.current !== watchedBranchId) {
+      setValue("room_id", "")
+    }
+    prevBranchId.current = watchedBranchId
+  }, [watchedBranchId, setValue])
+
+  const { data: roomsData } = useQuery({
+    queryKey: ["rooms", "select", watchedBranchId],
+    queryFn: () => {
+      const params: Record<string, string> = { page_size: "500" }
+      if (watchedBranchId) params.branch_id = watchedBranchId
+      return getRooms(params)
+    },
+    enabled: !!watchedBranchId,
+  })
+
+  const roomsList = useMemo(() => {
+    const raw = (roomsData as any)?.items ?? (Array.isArray(roomsData) ? roomsData : [])
+    return Array.isArray(raw) ? raw : (raw as any)?.items ?? []
+  }, [roomsData])
+
+  const { data: employeesData } = useQuery({
+    queryKey: ["employees", "select"],
+    queryFn: () => getEmployees(scopeMerge({ page_size: "500" })),
+  })
+
+  const employeesList = useMemo(() => {
+    const raw = (employeesData as any)?.items ?? (Array.isArray(employeesData) ? employeesData : [])
+    return Array.isArray(raw) ? raw : (raw as any)?.items ?? []
+  }, [employeesData])
 
   const openCreate = (hId?: string, bId?: string) => {
     reset({
@@ -205,16 +288,32 @@ export function HousekeepingPage() {
   if (isLoading && allTasks.length === 0) return <PageLoader />
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t("housekeeping.title")}</h1>
-          <p className="text-gray-500 mt-1">{t("housekeeping.subtitle")}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t("housekeeping.title")}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t("housekeeping.subtitle")}</p>
         </div>
-        <Button onClick={() => openCreate()}>
-          <Plus className="h-4 w-4" />
-          {t("housekeeping.newTask")}
-        </Button>
+        <div className="flex gap-2 self-start sm:self-auto">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10"
+            title={t("housekeeping.refresh", "Refresh")}
+            onClick={() => {
+              queryClient.invalidateQueries({ queryKey: ["housekeeping"] })
+              queryClient.invalidateQueries({ queryKey: ["hotels"] })
+              queryClient.invalidateQueries({ queryKey: ["branches"] })
+              queryClient.invalidateQueries({ queryKey: ["employees"] })
+            }}
+          >
+            <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
+          </Button>
+          <Button onClick={() => openCreate()}>
+            <Plus className="h-4 w-4" />
+            {t("housekeeping.newTask")}
+          </Button>
+        </div>
       </div>
 
       <div className="relative">
@@ -244,7 +343,7 @@ export function HousekeepingPage() {
             <Card key={hotel.id}>
               <button
                 onClick={() => toggleHotel(hotel.id)}
-                className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors rounded-lg text-left"
+                className="w-full flex items-center gap-2 sm:gap-3 p-3 sm:p-4 hover:bg-gray-50 transition-colors rounded-lg text-left"
               >
                 {isHotelExpanded ? (
                   <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
@@ -253,13 +352,16 @@ export function HousekeepingPage() {
                 )}
                 <Building2 className="h-5 w-5 text-primary-600 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <span className="font-semibold text-gray-900">{hotel.name}</span>
+                  <span className="font-semibold text-sm sm:text-base text-gray-900 truncate block">{hotel.name}</span>
                   {hotel.code && (
-                    <span className="text-xs text-gray-400 ml-2">({hotel.code})</span>
+                    <span className="text-xs text-gray-400 hidden sm:inline">({hotel.code})</span>
                   )}
                 </div>
-                <span className="text-xs text-gray-400 shrink-0">
+                <span className="text-xs text-gray-400 shrink-0 hidden sm:block">
                   {branches.length} {t("rooms.branch")} / {totalTasks} {t("housekeeping.title")}
+                </span>
+                <span className="text-xs text-gray-400 shrink-0 sm:hidden">
+                  {branches.length}b / {totalTasks}t
                 </span>
                 <Button
                   variant="ghost"
@@ -282,7 +384,7 @@ export function HousekeepingPage() {
                       {t("housekeeping.noTasks", "No tasks")}
                     </div>
                   ) : (
-                    <div className="space-y-1 p-2">
+                    <div className="space-y-1 p-1 sm:p-2">
                       {branches.map(({ branch, tasks }) => {
                         const isBranchExpanded = expandedBranches.has(branch.id)
                         const branchTasks = getTasksForBranch(branch.id)
@@ -291,7 +393,7 @@ export function HousekeepingPage() {
                           <div key={branch.id}>
                             <button
                               onClick={() => toggleBranch(branch.id)}
-                              className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors rounded-lg text-left ml-2"
+                              className="w-full flex items-center gap-2 sm:gap-3 p-2 sm:p-3 hover:bg-gray-50 transition-colors rounded-lg text-left ml-1 sm:ml-2"
                             >
                               {isBranchExpanded ? (
                                 <ChevronDown className="h-3.5 w-3.5 text-gray-400 shrink-0" />
@@ -299,12 +401,12 @@ export function HousekeepingPage() {
                                 <ChevronRight className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                               )}
                               <DoorOpen className="h-4 w-4 text-emerald-600 shrink-0" />
-                              <span className="font-medium text-gray-700">{branch.name}</span>
+                              <span className="font-medium text-sm text-gray-700 truncate">{branch.name}</span>
                               {branch.code && (
-                                <span className="text-xs text-gray-400">({branch.code})</span>
+                                <span className="text-xs text-gray-400 hidden sm:inline">({branch.code})</span>
                               )}
                               <span className="text-xs text-gray-400 ml-auto shrink-0">
-                                {branchTasks.length} {t("housekeeping.title")}
+                                {branchTasks.length}
                               </span>
                               <Button
                                 variant="ghost"
@@ -320,40 +422,93 @@ export function HousekeepingPage() {
                             </button>
 
                             {isBranchExpanded && (
-                              <div className="ml-6 border-l-2 border-gray-100 pl-4">
+                              <div className="ml-3 sm:ml-6 border-l-2 border-gray-100 pl-2 sm:pl-4">
                                 {branchTasks.length === 0 ? (
                                   <div className="py-3 text-sm text-gray-400">
                                     {t("housekeeping.noTasks", "No tasks")}
                                   </div>
                                 ) : (
-                                  <div className="space-y-1 py-1">
-                                    <div className="grid grid-cols-12 gap-2 px-3 py-1 text-xs font-medium text-gray-400 uppercase">
-                                      <span className="col-span-2">{t("housekeeping.room")}</span>
+                                  <div className="space-y-0">
+                                    <div className="hidden md:grid grid-cols-12 gap-2 px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 rounded-t-md border-b border-gray-200">
+                                      <span className="col-span-1">{t("housekeeping.room")}</span>
                                       <span className="col-span-1">{t("housekeeping.type")}</span>
                                       <span className="col-span-1">{t("housekeeping.priority")}</span>
                                       <span className="col-span-2">{t("housekeeping.status")}</span>
                                       <span className="col-span-2">{t("housekeeping.assignedTo")}</span>
                                       <span className="col-span-2">{t("housekeeping.scheduled")}</span>
-                                      <span className="col-span-2" />
+                                      <span className="col-span-3 text-right">{t("housekeeping.actions", "Actions")}</span>
                                     </div>
-                                    {branchTasks.map((task) => (
+                                    {branchTasks.map((task, idx) => (
                                       <div
                                         key={task.id}
                                         className={cn(
-                                          "grid grid-cols-12 gap-2 px-3 py-2 rounded-md items-center",
-                                          "hover:bg-gray-50 transition-colors"
+                                          "transition-colors border-b border-gray-50 last:border-b-0",
+                                          "md:grid md:grid-cols-12 md:gap-2 md:px-4 md:py-3 md:items-center",
+                                          "flex flex-col gap-1.5 p-3 sm:p-3 md:p-0 border border-gray-100 md:border-0 md:border-b md:border-gray-100 rounded-lg md:rounded-none mb-2 md:mb-0",
+                                          idx % 2 === 0 ? "md:bg-white" : "md:bg-gray-50/30",
+                                          "hover:bg-gray-100/50 md:hover:bg-blue-50/30"
                                         )}
                                       >
-                                        <span className="col-span-2 font-medium text-gray-900 text-sm">
-                                          {task.room?.room_number || t("housekeeping.na")}
+                                        <div className="md:hidden flex items-center justify-between">
+                                          <div className="flex items-center gap-2">
+                                            <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary-50 text-primary-700 font-bold text-xs">
+                                              {task.room?.room_number || "?"}
+                                            </span>
+                                            <span className="font-semibold text-gray-900 text-sm">
+                                              {t("housekeeping.room")}: {task.room?.room_number || t("housekeeping.na")}
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center gap-0.5">
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              className={cn(
+                                                "relative",
+                                                task.photo_count > 0
+                                                  ? "text-blue-600 hover:text-blue-800"
+                                                  : "text-gray-300 hover:text-gray-500"
+                                              )}
+                                              onClick={() => setPhotoModal(task)}
+                                            >
+                                              <ImageIcon className="h-4 w-4" />
+                                              {task.photo_count > 0 && (
+                                                <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-blue-500 rounded-full">
+                                                  {task.photo_count}
+                                                </span>
+                                              )}
+                                            </Button>
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              onClick={() => setAssignModal(task)}
+                                            >
+                                              {t("housekeeping.assign")}
+                                            </Button>
+                                          </div>
+                                        </div>
+
+                                        <span className="hidden md:flex col-span-1 items-center">
+                                          <span className="inline-flex items-center justify-center min-w-[28px] h-6 rounded bg-primary-50 text-primary-700 font-bold text-xs shrink-0 px-1.5">
+                                            {task.room?.room_number || "?"}
+                                          </span>
                                         </span>
-                                        <span className="col-span-1">
+                                        <span className="md:hidden flex items-center gap-2 text-sm">
+                                          <span className="text-gray-400 min-w-[60px]">{t("housekeeping.type")}:</span>
                                           <Badge variant={task.task_type} />
                                         </span>
-                                        <span className="col-span-1">
+                                        <span className="hidden md:block col-span-1">
+                                          <Badge variant={task.task_type} className="text-[10px] px-2 py-0.5" />
+                                        </span>
+                                        <span className="md:hidden flex items-center gap-2 text-sm">
+                                          <span className="text-gray-400 min-w-[60px]">{t("housekeeping.priority")}:</span>
                                           <Badge variant={task.priority} />
                                         </span>
-                                        <span className="col-span-2">
+                                        <span className="hidden md:block col-span-1">
+                                          <Badge variant={task.priority} className="text-[10px] px-2 py-0.5" />
+                                        </span>
+
+                                        <span className="md:hidden flex items-center gap-2 text-sm">
+                                          <span className="text-gray-500">{t("housekeeping.status")}:</span>
                                           <div className="flex items-center gap-1">
                                             <Badge variant={task.status} />
                                             {(task.status === "OPEN" || task.status === "IN_PROGRESS") && (
@@ -386,20 +541,86 @@ export function HousekeepingPage() {
                                             )}
                                           </div>
                                         </span>
-                                        <span className="col-span-2 text-sm text-gray-600 truncate">
-                                          {task.assigned_user
-                                            ? `${task.assigned_user.first_name} ${task.assigned_user.last_name}`
-                                            : "-"}
+
+                                        <span className="hidden md:flex col-span-2 items-center gap-1.5">
+                                          <Badge variant={task.status} className="text-[10px] px-2 py-0.5" />
+                                          {(task.status === "OPEN" || task.status === "IN_PROGRESS") && (
+                                            <select
+                                              className="text-[11px] border border-gray-200 rounded-md px-1.5 py-0.5 bg-white hover:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 cursor-pointer text-gray-500"
+                                              value=""
+                                              onChange={(e) => {
+                                                if (e.target.value)
+                                                  statusMutation.mutate({
+                                                    id: task.id,
+                                                    status: e.target.value,
+                                                  })
+                                              }}
+                                            >
+                                              <option value="">{t("housekeeping.change")}</option>
+                                              {task.status === "OPEN" && (
+                                                <option value="IN_PROGRESS">
+                                                  {t("housekeeping.start")}
+                                                </option>
+                                              )}
+                                              {task.status === "IN_PROGRESS" && (
+                                                <option value="COMPLETED">
+                                                  {t("housekeeping.complete")}
+                                                </option>
+                                              )}
+                                              <option value="CANCELLED">
+                                                {t("housekeeping.cancelTask")}
+                                              </option>
+                                            </select>
+                                          )}
                                         </span>
-                                        <span className="col-span-2 text-xs text-gray-500">
+
+                                        <div className="md:hidden grid grid-cols-2 gap-1 text-sm">
+                                          <span className="text-gray-400 min-w-[60px]">{t("housekeeping.assignedTo")}:</span>
+                                          <span className="text-gray-600 truncate">
+                                            {task.assigned_user
+                                              ? `${task.assigned_user.first_name} ${task.assigned_user.last_name}`
+                                              : "-"}
+                                          </span>
+                                          <span className="text-gray-400 min-w-[60px]">{t("housekeeping.scheduled")}:</span>
+                                          <span className="text-gray-500">
+                                            {task.scheduled_date ? formatDate(task.scheduled_date) : "-"}
+                                          </span>
+                                        </div>
+
+                                        <span className="hidden md:flex col-span-2 items-center text-sm text-gray-700 truncate">
+                                          {task.assigned_user
+                                            ? (<span className="inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />{task.assigned_user.first_name} {task.assigned_user.last_name}</span>)
+                                            : (<span className="text-gray-300">-</span>)}
+                                        </span>
+                                        <span className="hidden md:flex col-span-2 items-center text-xs text-gray-500">
                                           {task.scheduled_date
                                             ? formatDate(task.scheduled_date)
-                                            : "-"}
+                                            : <span className="text-gray-300">-</span>}
                                         </span>
-                                        <span className="col-span-2 flex justify-end">
+                                        <span className="hidden md:flex col-span-3 justify-end items-center gap-0.5">
+                                          <button
+                                            className={cn(
+                                              "p-1.5 rounded-lg transition-colors",
+                                              task.photo_count > 0
+                                                ? "text-blue-600 hover:bg-blue-50"
+                                                : "text-gray-300 hover:text-gray-400 hover:bg-gray-50"
+                                            )}
+                                            title={t("housekeeping.viewPhotos")}
+                                            onClick={() => setPhotoModal(task)}
+                                          >
+                                            <div className="relative">
+                                              <ImageIcon className="h-4 w-4" />
+                                              {task.photo_count > 0 && (
+                                                <span className="absolute -top-1 -right-1.5 inline-flex items-center justify-center min-w-[16px] h-4 text-[10px] font-bold text-white bg-blue-500 rounded-full px-1">
+                                                  {task.photo_count}
+                                                </span>
+                                              )}
+                                            </div>
+                                          </button>
                                           <Button
                                             variant="ghost"
                                             size="sm"
+                                            className="text-xs"
                                             onClick={() => setAssignModal(task)}
                                           >
                                             {t("housekeeping.assign")}
@@ -435,38 +656,66 @@ export function HousekeepingPage() {
         title={t("housekeeping.createTask")}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Input
+          {isSuperAdmin && (
+            <Select
               id="hotel_id"
               label={t("housekeeping.hotelId") + " *"}
-              placeholder={t("housekeeping.uuid")}
+              options={hotelsList.map((h: any) => ({ value: h.id, label: h.name }))}
+              placeholder={t("housekeeping.selectHotel", "Select hotel")}
               error={errors.hotel_id?.message}
-              disabled={!isSuperAdmin}
               {...register("hotel_id")}
             />
+          )}
+          {!isSuperAdmin && (
             <Input
-              id="branch_id"
-              label={t("housekeeping.branchId") + " *"}
+              id="hotel_id"
+              label={t("housekeeping.hotelId")}
               placeholder={t("housekeeping.uuid")}
-              error={errors.branch_id?.message}
-              {...register("branch_id")}
+              disabled
+              {...register("hotel_id")}
             />
-          </div>
-
-          <Input
+          )}
+          <Select
+            id="branch_id"
+            label={t("housekeeping.branchId") + " *"}
+            options={
+              watchedHotelId
+                ? visibleBranches
+                    .filter((b: any) => b.hotel_id === watchedHotelId)
+                    .map((b: any) => ({
+                      value: b.id,
+                      label: `${b.name}${b.code ? ` (${b.code})` : ""}`,
+                    }))
+                : visibleBranches.map((b: any) => ({
+                    value: b.id,
+                    label: `${b.name}${b.code ? ` (${b.code})` : ""}`,
+                  }))
+            }
+            placeholder={t("housekeeping.selectBranch", "Select branch")}
+            error={errors.branch_id?.message}
+            disabled={!isSuperAdmin && !!branchId}
+            {...register("branch_id")}
+          />
+          <Select
             id="room_id"
             label={t("housekeeping.roomId") + " *"}
-            placeholder={t("housekeeping.uuid")}
+            options={roomsList.map((r: any) => ({
+              value: r.id,
+              label: `${r.room_number}${r.room_type ? ` - ${r.room_type}` : ""}`,
+            }))}
+            placeholder={t("housekeeping.selectRoom", "Select room")}
             error={errors.room_id?.message}
+            disabled={!watchedBranchId}
             {...register("room_id")}
           />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
               id="task_type"
               label={t("housekeeping.taskType") + " *"}
               options={[
                 { value: "CLEANING", label: t("housekeeping.cleaning") },
+                { value: "DEEP_CLEANING", label: t("housekeeping.deepCleaning") },
                 { value: "MAINTENANCE", label: t("housekeeping.maintenance") },
                 { value: "INSPECTION", label: t("housekeeping.inspection") },
                 { value: "TURN_DOWN", label: t("housekeeping.turnDown") },
@@ -486,10 +735,17 @@ export function HousekeepingPage() {
             />
           </div>
 
-          <Input
+          <Select
             id="assigned_to"
             label={t("housekeeping.assignedToUserId")}
-            placeholder={t("housekeeping.uuid")}
+            options={[
+              { value: "", label: t("housekeeping.unassigned", "None") },
+              ...employeesList.map((e: any) => ({
+                value: e.id,
+                label: `${e.first_name} ${e.last_name}${e.username ? ` (@${e.username})` : ""}`,
+              })),
+            ]}
+            placeholder={t("housekeeping.selectEmployee", "Select employee")}
             {...register("assigned_to")}
           />
           <Input
@@ -521,15 +777,19 @@ export function HousekeepingPage() {
           onSubmit={(e) => {
             e.preventDefault()
             const form = e.target as HTMLFormElement
-            const userId = (form.elements.namedItem("user_id") as HTMLInputElement).value
-            assignMutation.mutate({ id: assignModal!.id, userId })
+            const userId = (form.elements.namedItem("user_id") as HTMLSelectElement).value
+            if (userId) assignMutation.mutate({ id: assignModal!.id, userId })
           }}
           className="space-y-4"
         >
-          <Input
+          <Select
             id="user_id"
             label={t("housekeeping.userRequired")}
-            placeholder={t("housekeeping.enterEmployeeUuid")}
+            options={employeesList.map((e: any) => ({
+              value: e.id,
+              label: `${e.first_name} ${e.last_name}${e.username ? ` (@${e.username})` : ""}`,
+            }))}
+            placeholder={t("housekeeping.selectEmployee", "Select employee")}
           />
           <div className="flex justify-end gap-3">
             <Button type="button" variant="secondary" onClick={() => setAssignModal(null)}>
@@ -540,6 +800,38 @@ export function HousekeepingPage() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      <Modal
+        open={!!photoModal}
+        onClose={() => setPhotoModal(null)}
+        title={`${t("housekeeping.photoReport")}: ${t("housekeeping.room")} ${photoModal?.room?.room_number || t("housekeeping.na")}`}
+        size="lg"
+      >
+        {photosLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+          </div>
+        ) : taskPhotos && taskPhotos.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {taskPhotos.map((photo: TaskPhoto) => (
+              <div
+                key={photo.id}
+                className="block rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-shadow"
+              >
+                <PhotoImage taskId={photoModal!.id} photoId={photo.id} fileName={photo.file_name} />
+                <div className="p-2 text-xs text-gray-500 truncate">
+                  {photo.file_name}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-gray-400">
+            <ImageIcon className="h-10 w-10 mx-auto mb-3 opacity-30" />
+            <p>{t("housekeeping.noPhotos")}</p>
+          </div>
+        )}
       </Modal>
     </div>
   )

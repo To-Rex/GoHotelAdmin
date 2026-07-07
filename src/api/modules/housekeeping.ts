@@ -5,6 +5,7 @@ import type {
   HousekeepingTaskUpdateRequest,
   HousekeepingStatusUpdate,
   HousekeepingAssignRequest,
+  TaskPhoto,
 } from "@/types/housekeeping"
 
 export async function getHousekeepingTasks(params?: Record<string, string>) {
@@ -32,7 +33,10 @@ export async function getHousekeepingTask(
 export async function createHousekeepingTask(
   data: HousekeepingTaskCreateRequest
 ): Promise<HousekeepingTask> {
-  const res = await api.post("/housekeeping/tasks", data)
+  const { hotel_id, ...body } = data
+  const params: Record<string, string> = {}
+  if (hotel_id) params.hotel_id = hotel_id
+  const res = await api.post("/housekeeping/tasks", body, { params })
   return res.data
 }
 
@@ -57,5 +61,10 @@ export async function assignHousekeepingTask(
   data: HousekeepingAssignRequest
 ): Promise<HousekeepingTask> {
   const res = await api.post(`/housekeeping/tasks/${id}/assign`, data)
+  return res.data
+}
+
+export async function getTaskPhotos(taskId: string, params?: Record<string, string>): Promise<TaskPhoto[]> {
+  const res = await api.get(`/tasks/${taskId}/photos`, { params })
   return res.data
 }
