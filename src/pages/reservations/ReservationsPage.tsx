@@ -264,17 +264,16 @@ export function ReservationsPage() {
     },
     {
       key: "payment_status",
-      header: "To'lov",
+      header: t("reservations.payment"),
       render: (r) => {
-        const labels: Record<string, string> = { UNPAID: "To'lanmagan", PARTIALLY_PAID: "Qisman", PAID: "To'langan" }
         const colors: Record<string, string> = { UNPAID: "bg-red-100 text-red-700", PARTIALLY_PAID: "bg-amber-100 text-amber-700", PAID: "bg-emerald-100 text-emerald-700" }
-        return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors[r.payment_status] || "bg-gray-100 text-gray-600"}`}>{labels[r.payment_status] || r.payment_status}</span>
+        return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors[r.payment_status] || "bg-gray-100 text-gray-600"}`}>{t(`status.${r.payment_status}`, r.payment_status)}</span>
       },
     },
     {
       key: "total_amount",
-      header: "Summa",
-      render: (r) => r.total_amount > 0 ? `${r.total_amount.toLocaleString()} so'm` : "—",
+      header: t("reservations.amount"),
+      render: (r) => r.total_amount > 0 ? `${r.total_amount.toLocaleString()} ${t("common.som")}` : "—",
     },
     {
       key: "actions",
@@ -416,8 +415,8 @@ export function ReservationsPage() {
                                     <span className="col-span-1">{t("reservations.room")}</span>
                                     <span className="col-span-2">{t("reservations.dates")}</span>
                                     <span className="col-span-1">{t("reservations.status")}</span>
-                                    <span className="col-span-1">To'lov</span>
-                                    <span className="col-span-1">Summa</span>
+                                    <span className="col-span-1">{t("reservations.payment")}</span>
+                                    <span className="col-span-1">{t("reservations.amount")}</span>
                                     <span className="col-span-2" />
                                   </div>
                                   {branchRes.map((r) => (
@@ -447,13 +446,12 @@ export function ReservationsPage() {
                                       </span>
                                       <span className="col-span-1">
                                         {(() => {
-                                          const labels: Record<string, string> = { UNPAID: "To'lanmagan", PARTIALLY_PAID: "Qisman", PAID: "To'langan" }
                                           const colors: Record<string, string> = { UNPAID: "bg-red-100 text-red-700", PARTIALLY_PAID: "bg-amber-100 text-amber-700", PAID: "bg-emerald-100 text-emerald-700" }
-                                          return <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${colors[r.payment_status] || "bg-gray-100 text-gray-600"}`}>{labels[r.payment_status] || r.payment_status}</span>
+                                          return <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${colors[r.payment_status] || "bg-gray-100 text-gray-600"}`}>{t(`status.${r.payment_status}`, r.payment_status)}</span>
                                         })()}
                                       </span>
                                       <span className="col-span-1 text-sm text-gray-700">
-                                        {r.total_amount > 0 ? `${r.total_amount.toLocaleString()} so'm` : "—"}
+                                        {r.total_amount > 0 ? `${r.total_amount.toLocaleString()} ${t("common.som")}` : "—"}
                                       </span>
                                       <span className="col-span-2 flex gap-1 justify-end">
                                         {r.status === "CONFIRMED" && (
@@ -684,26 +682,26 @@ export function ReservationsPage() {
           <div className="grid grid-cols-2 gap-4">
             <Input
               id="payment_amount"
-              label="To'lov summasi"
+              label={t("reservations.paymentAmount")}
               type="number"
               min={0}
               {...register("payment_amount", { valueAsNumber: true })}
             />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                To'lov turi
+                {t("reservations.paymentMethod")}
               </label>
               <select
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 {...register("payment_method")}
               >
-                <option value="">Tanlanmagan</option>
-                <option value="CASH">Naqd</option>
-                <option value="CREDIT_CARD">Kredit karta</option>
-                <option value="DEBIT_CARD">Debet karta</option>
-                <option value="BANK_TRANSFER">Bank o'tkazmasi</option>
-                <option value="MOBILE_PAYMENT">Mobil to'lov</option>
-                <option value="ONLINE">Online</option>
+                <option value="">{t("reservations.notSelected")}</option>
+                <option value="CASH">{t("status.CASH")}</option>
+                <option value="CREDIT_CARD">{t("status.CREDIT_CARD")}</option>
+                <option value="DEBIT_CARD">{t("status.DEBIT_CARD")}</option>
+                <option value="BANK_TRANSFER">{t("status.BANK_TRANSFER")}</option>
+                <option value="MOBILE_PAYMENT">{t("status.MOBILE_PAYMENT")}</option>
+                <option value="ONLINE">{t("status.ONLINE")}</option>
               </select>
             </div>
           </div>

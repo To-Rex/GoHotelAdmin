@@ -333,11 +333,11 @@ export function RoomsPage() {
 
   const typeOptions = useMemo(() => {
     const types: RoomType[] = Array.isArray(roomTypes) ? roomTypes : []
-    return types.map((t) => ({
-      value: t.id,
-      label: `${t.name} (${t.base_price.toLocaleString()} so'm)`,
+    return types.map((rt) => ({
+      value: rt.id,
+      label: `${rt.name} (${rt.base_price.toLocaleString()} ${t("common.som")})`,
     }))
-  }, [roomTypes])
+  }, [roomTypes, t])
 
   const branchesList: Branch[] =
     branchesData?.items ?? (Array.isArray(branchesData) ? branchesData : [])
@@ -505,7 +505,7 @@ export function RoomsPage() {
                                       <span className="col-span-2">{t("rooms.room")}</span>
                                       <span className="col-span-2">{t("rooms.type")}</span>
                                       <span className="col-span-1">{t("rooms.floor")}</span>
-                                      <span className="col-span-1">Narx</span>
+                                      <span className="col-span-1">{t("rooms.price")}</span>
                                       <span className="col-span-2">{t("rooms.status")}</span>
                                       <span className="col-span-2">{t("rooms.created")}</span>
                                       <span className="col-span-2" />
@@ -530,7 +530,7 @@ export function RoomsPage() {
                                             : "-"}
                                         </span>
                                         <span className="col-span-1 text-sm font-medium text-primary-700">
-                                          {room.base_price ? `${room.base_price.toLocaleString()} so'm` : "—"}
+                                          {room.base_price ? `${room.base_price.toLocaleString()} ${t("common.som")}` : "—"}
                                         </span>
                                         <span className="col-span-2">
                                           <button
@@ -601,7 +601,7 @@ export function RoomsPage() {
           {isSuperAdmin && (
             <Select
               id="hotel_id"
-              label="Mehmonxona *"
+              label={t("rooms.hotel") + " *"}
               options={hotelOptions}
               placeholder={t("rooms.selectHotel")}
               error={errors.hotel_id?.message}
@@ -610,7 +610,7 @@ export function RoomsPage() {
           )}
           <Select
             id="branch_id"
-            label="Filial *"
+            label={t("rooms.branch") + " *"}
             options={branchOptions}
             placeholder={t("rooms.selectBranch")}
             error={errors.branch_id?.message}
@@ -627,7 +627,7 @@ export function RoomsPage() {
             />
             <Input
               id="base_price"
-              label="Narx (1 kecha)"
+              label={t("rooms.basePrice")}
               type="number"
               min={0}
               placeholder="0"
@@ -638,7 +638,7 @@ export function RoomsPage() {
           <div className="grid grid-cols-2 gap-4">
             <Input
               id="capacity"
-              label="Sig'im"
+              label={t("rooms.capacity")}
               type="number"
               min={1}
               {...register("capacity", { valueAsNumber: true })}

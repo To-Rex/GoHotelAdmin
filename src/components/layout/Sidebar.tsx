@@ -48,8 +48,8 @@ export function Sidebar({ collapsed, onCollapsedChange }: SidebarProps) {
       section: t("sidebar.operations"),
       items: [
         { name: t("sidebar.rooms"), href: "/rooms", icon: DoorOpen },
-        { name: "Xona turlari", href: "/room-types", icon: Package },
-        { name: "Qulayliklar", href: "/amenities", icon: Package },
+        { name: t("sidebar.roomTypes"), href: "/room-types", icon: Package },
+        { name: t("sidebar.amenities"), href: "/amenities", icon: Package },
         { name: t("sidebar.guests"), href: "/guests", icon: Users },
         { name: t("sidebar.reservations"), href: "/reservations", icon: CalendarCheck },
         { name: t("sidebar.booking"), href: "/booking", icon: CalendarPlus },

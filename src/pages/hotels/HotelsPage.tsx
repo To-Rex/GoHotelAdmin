@@ -189,7 +189,7 @@ export function HotelsPage() {
         canManageHotel(h.id) ? (
           <button
             onClick={(e) => { e.stopPropagation(); setStatusModal(h) }}
-            title="Statusni o'zgartirish"
+            title={t("hotels.changeStatus")}
             className="hover:opacity-80 transition-opacity"
           >
             <Badge variant={h.status} />
@@ -234,13 +234,13 @@ export function HotelsPage() {
                 className="text-red-600"
                 onClick={(e) => {
                   e.stopPropagation()
-                  if (confirm(`"${h.name}" mehmonxonasi va barcha ma'lumotlari o'chirilsinmi?`)) {
+                  if (confirm(t("hotels.deleteConfirm", { name: h.name }))) {
                     deleteMutation.mutate(h.id)
                   }
                 }}
                 disabled={deleteMutation.isPending}
               >
-                O'chirish
+                {t("hotels.delete")}
               </Button>
             )}
           </div>
@@ -318,12 +318,12 @@ export function HotelsPage() {
 
       <Modal open={!!statusModal} onClose={() => setStatusModal(null)} title={`Status: ${statusModal?.name}`} size="sm">
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">Joriy holat: <Badge variant={statusModal?.status || "ACTIVE"} /></p>
+          <p className="text-sm text-gray-600">{t("hotels.currentStatus")}: <Badge variant={statusModal?.status || "ACTIVE"} /></p>
           <div className="flex gap-2">
             {[
-              { value: "ACTIVE", label: "Aktiv" },
-              { value: "SUSPENDED", label: "Bloklangan" },
-              { value: "CLOSED", label: "Yopilgan" },
+              { value: "ACTIVE", label: t("status.ACTIVE") },
+              { value: "SUSPENDED", label: t("status.SUSPENDED") },
+              { value: "CLOSED", label: t("status.CLOSED") },
             ].map((s) => (
               <Button
                 key={s.value}

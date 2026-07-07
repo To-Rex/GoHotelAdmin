@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
       port,
       proxy: isDev ? {
         '/api': {
-          target: 'http://localhost:8000',
+          target: 'https://gohotel-gohotel-backend-lhyen5-ecceab-13-140-185-49.sslip.io/',
           changeOrigin: true,
         },
       } : undefined,

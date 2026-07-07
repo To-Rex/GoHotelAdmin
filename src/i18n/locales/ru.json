@@ -39,6 +39,8 @@
     "hotels": "Отели",
     "branches": "Филиалы",
     "rooms": "Номера",
+    "roomTypes": "Типы номеров",
+    "amenities": "Удобства",
     "guests": "Гости",
     "reservations": "Бронирования",
     "booking": "Бронирование",
@@ -84,6 +86,9 @@
     "create": "Создать",
     "updateStatus": "Обновить статус",
     "currentStatus": "Текущий статус",
+    "changeStatus": "Изменить статус",
+    "delete": "Удалить",
+    "deleteConfirm": "Удалить отель \"{{name}}\" и все его данные?",
     "branchesModal": "Филиалы",
     "noBranches": "Филиалы для этого отеля не найдены.",
     "add": "Добавить"
@@ -153,7 +158,56 @@
     "create": "Создать",
     "updateStatus": "Обновить статус",
     "current": "Текущий",
-    "deleteConfirm": "Удалить этот номер?"
+    "deleteConfirm": "Удалить этот номер?",
+    "basePrice": "Цена (1 ночь)",
+    "capacity": "Вместимость",
+    "price": "Цена"
+  },
+  "roomTypes": {
+    "title": "Типы номеров",
+    "subtitle": "Список доступных типов номеров",
+    "subtitleGlobal": "Глобальные типы номеров — можно привязать к отелям. Удобства управляются в отдельном разделе",
+    "newType": "Добавить новый тип",
+    "editType": "Редактировать тип номера",
+    "addType": "Добавить новый тип номера",
+    "name": "Название",
+    "namePlaceholder": "Напр: Deluxe, Standart",
+    "nameRequired": "Название обязательно",
+    "basePrice": "Цена по умолчанию",
+    "basePriceLabel": "Цена по умолчанию (1 ночь)",
+    "priceNonNegative": "Цена не может быть отрицательной",
+    "description": "Описание",
+    "descriptionPlaceholder": "Краткое описание...",
+    "status": "Статус",
+    "deleteConfirm": "Удалить \"{{name}}\"?"
+  },
+  "amenities": {
+    "title": "Удобства",
+    "subtitle": "Список доступных удобств",
+    "subtitleGlobal": "Глобальный список удобств — можно привязать ко всем отелям",
+    "newAmenity": "Новое удобство",
+    "editAmenity": "Редактировать удобство",
+    "addAmenity": "Добавить новое удобство",
+    "name": "Название",
+    "namePlaceholder": "Напр: Wi-Fi, TV",
+    "nameRequired": "Название обязательно",
+    "icon": "Иконка",
+    "notFound": "Удобства не найдены",
+    "deleteConfirm": "Удалить \"{{name}}\"?",
+    "icons": {
+      "none": "Без иконки",
+      "wind": "Кондиционер",
+      "bath": "Ванна",
+      "coffee": "Кофе",
+      "parking": "Парковка",
+      "pool": "Бассейн",
+      "gym": "Спортзал",
+      "restaurant": "Ресторан",
+      "bar": "Бар",
+      "laundry": "Прачечная",
+      "safe": "Сейф",
+      "fridge": "Холодильник"
+    }
   },
   "guests": {
     "title": "Гости",
@@ -207,7 +261,12 @@
     "checkIn": "Заезд",
     "checkOut": "Выезд",
     "bookNow": "Забронировать",
-    "booking": "Бронирование..."
+    "booking": "Бронирование...",
+    "selected": "Выбрано",
+    "notesPlaceholder": "Дополнительные заметки...",
+    "roomPrice": "Цена номера",
+    "paymentAmount": "Сумма оплаты",
+    "paymentMethodPlaceholder": "Способ оплаты..."
   },
   "reservations": {
     "title": "Бронирования",
@@ -251,7 +310,12 @@
     "selectedRoom": "Выбранный номер",
     "selectedDates": "Выбранные даты",
     "noRooms": "Нет доступных номеров",
-    "loadingRooms": "Загрузка номеров..."
+    "loadingRooms": "Загрузка номеров...",
+    "payment": "Оплата",
+    "amount": "Сумма",
+    "paymentAmount": "Сумма оплаты",
+    "paymentMethod": "Способ оплаты",
+    "notSelected": "Не выбрано"
   },
   "calendar": {
     "months": ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
@@ -332,10 +396,10 @@
     "categoryRequired": "Категория обязательна",
     "categoryPlaceholder": "Напр: FOOD, SPA, TRANSPORT",
     "description": "Описание",
-    "hotelId": "ID отеля",
-    "serviceId": "ID услуги",
-    "hotelRequired": "ID отеля обязателен",
-    "serviceRequired": "ID услуги обязателен",
+    "hotelId": "Отель",
+    "serviceId": "Услуга",
+    "hotelRequired": "Отель обязателен",
+    "serviceRequired": "Услуга обязательна",
     "priceNonNegative": "Цена не может быть отрицательной",
     "uuid": "UUID",
     "noServices": "Услуги не определены",
@@ -493,7 +557,8 @@
     "loading": "Загрузка...",
     "showing": "Страница {{page}} из {{totalPages}} (всего {{total}})",
     "previous": "Назад",
-    "next": "Вперёд"
+    "next": "Вперёд",
+    "som": "сум"
   },
   "status": {
     "ACTIVE": "Активен",
@@ -519,6 +584,7 @@
     "COMPLETED": "Завершён",
     "DRAFT": "Черновик",
     "ISSUED": "Выставлен",
+    "UNPAID": "Не оплачен",
     "PARTIALLY_PAID": "Частично оплачен",
     "PAID": "Оплачен",
     "REFUNDED": "Возвращён",

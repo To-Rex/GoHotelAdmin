@@ -39,6 +39,8 @@
     "hotels": "Hotels",
     "branches": "Branches",
     "rooms": "Rooms",
+    "roomTypes": "Room Types",
+    "amenities": "Amenities",
     "guests": "Guests",
     "reservations": "Reservations",
     "booking": "Booking",
@@ -84,6 +86,9 @@
     "create": "Create",
     "updateStatus": "Update Status",
     "currentStatus": "Current status",
+    "changeStatus": "Change status",
+    "delete": "Delete",
+    "deleteConfirm": "Delete hotel \"{{name}}\" and all its data?",
     "branchesModal": "Branches",
     "noBranches": "No branches found for this hotel.",
     "add": "Add"
@@ -153,7 +158,56 @@
     "create": "Create",
     "updateStatus": "Update Status",
     "current": "Current",
-    "deleteConfirm": "Delete this room?"
+    "deleteConfirm": "Delete this room?",
+    "basePrice": "Price (1 night)",
+    "capacity": "Capacity",
+    "price": "Price"
+  },
+  "roomTypes": {
+    "title": "Room Types",
+    "subtitle": "List of available room types",
+    "subtitleGlobal": "Global room types — can be assigned to hotels. Amenities are managed in a separate section",
+    "newType": "Add New Type",
+    "editType": "Edit Room Type",
+    "addType": "Add New Room Type",
+    "name": "Name",
+    "namePlaceholder": "e.g. Deluxe, Standard",
+    "nameRequired": "Name is required",
+    "basePrice": "Default Price",
+    "basePriceLabel": "Default price (1 night)",
+    "priceNonNegative": "Price must be non-negative",
+    "description": "Description",
+    "descriptionPlaceholder": "Short description...",
+    "status": "Status",
+    "deleteConfirm": "Delete \"{{name}}\"?"
+  },
+  "amenities": {
+    "title": "Amenities",
+    "subtitle": "List of available amenities",
+    "subtitleGlobal": "Global amenities list — can be assigned to all hotels",
+    "newAmenity": "New Amenity",
+    "editAmenity": "Edit Amenity",
+    "addAmenity": "Add New Amenity",
+    "name": "Name",
+    "namePlaceholder": "e.g. Wi-Fi, TV",
+    "nameRequired": "Name is required",
+    "icon": "Icon",
+    "notFound": "No amenities found",
+    "deleteConfirm": "Delete \"{{name}}\"?",
+    "icons": {
+      "none": "No icon",
+      "wind": "Air conditioning",
+      "bath": "Bath",
+      "coffee": "Coffee",
+      "parking": "Parking",
+      "pool": "Pool",
+      "gym": "Gym",
+      "restaurant": "Restaurant",
+      "bar": "Bar",
+      "laundry": "Laundry",
+      "safe": "Safe",
+      "fridge": "Fridge"
+    }
   },
   "guests": {
     "title": "Guests",
@@ -207,7 +261,12 @@
     "checkIn": "Check-In",
     "checkOut": "Check-Out",
     "bookNow": "Book Now",
-    "booking": "Booking..."
+    "booking": "Booking...",
+    "selected": "Selected",
+    "notesPlaceholder": "Additional notes...",
+    "roomPrice": "Room price",
+    "paymentAmount": "Payment amount",
+    "paymentMethodPlaceholder": "Payment method..."
   },
   "reservations": {
     "title": "Reservations",
@@ -251,7 +310,12 @@
     "selectedRoom": "Selected Room",
     "selectedDates": "Selected Dates",
     "noRooms": "No rooms available",
-    "loadingRooms": "Loading rooms..."
+    "loadingRooms": "Loading rooms...",
+    "payment": "Payment",
+    "amount": "Amount",
+    "paymentAmount": "Payment amount",
+    "paymentMethod": "Payment method",
+    "notSelected": "Not selected"
   },
   "calendar": {
     "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
@@ -332,10 +396,10 @@
     "categoryRequired": "Category is required",
     "categoryPlaceholder": "e.g. FOOD, SPA, TRANSPORT",
     "description": "Description",
-    "hotelId": "Hotel ID",
-    "serviceId": "Service ID",
-    "hotelRequired": "Hotel ID is required",
-    "serviceRequired": "Service ID is required",
+    "hotelId": "Hotel",
+    "serviceId": "Service",
+    "hotelRequired": "Hotel is required",
+    "serviceRequired": "Service is required",
     "priceNonNegative": "Price must be non-negative",
     "uuid": "UUID",
     "noServices": "No services defined",
@@ -493,7 +557,8 @@
     "loading": "Loading...",
     "showing": "Showing page {{page}} of {{totalPages}} ({{total}} total)",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "som": "UZS"
   },
   "status": {
     "ACTIVE": "Active",
@@ -519,6 +584,7 @@
     "COMPLETED": "Completed",
     "DRAFT": "Draft",
     "ISSUED": "Issued",
+    "UNPAID": "Unpaid",
     "PARTIALLY_PAID": "Partially Paid",
     "PAID": "Paid",
     "REFUNDED": "Refunded",

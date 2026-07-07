@@ -39,6 +39,8 @@
     "hotels": "Mehmonxonalar",
     "branches": "Filiallar",
     "rooms": "Xonalar",
+    "roomTypes": "Xona turlari",
+    "amenities": "Qulayliklar",
     "guests": "Mehmonlar",
     "reservations": "Bronlar",
     "booking": "Band qilish",
@@ -84,6 +86,9 @@
     "create": "Yaratish",
     "updateStatus": "Holatni yangilash",
     "currentStatus": "Joriy holat",
+    "changeStatus": "Statusni o'zgartirish",
+    "delete": "O'chirish",
+    "deleteConfirm": "\"{{name}}\" mehmonxonasi va barcha ma'lumotlari o'chirilsinmi?",
     "branchesModal": "Filiallar",
     "noBranches": "Bu mehmonxona uchun filiallar topilmadi.",
     "add": "Qo'shish"
@@ -153,7 +158,56 @@
     "create": "Yaratish",
     "updateStatus": "Holatni yangilash",
     "current": "Joriy",
-    "deleteConfirm": "Bu xonani o'chirishni xohlaysizmi?"
+    "deleteConfirm": "Bu xonani o'chirishni xohlaysizmi?",
+    "basePrice": "Narx (1 kecha)",
+    "capacity": "Sig'im",
+    "price": "Narx"
+  },
+  "roomTypes": {
+    "title": "Xona turlari",
+    "subtitle": "Mavjud xona turlari ro'yxati",
+    "subtitleGlobal": "Global xona turlari — mehmonxonalarga biriktirish mumkin. Qulayliklar alohida bo'limda boshqariladi",
+    "newType": "Yangi tur qo'shish",
+    "editType": "Xona turini tahrirlash",
+    "addType": "Yangi xona turi qo'shish",
+    "name": "Nomi",
+    "namePlaceholder": "Masalan: Deluxe, Standart",
+    "nameRequired": "Nomi kiritilishi shart",
+    "basePrice": "Default narx",
+    "basePriceLabel": "Default narx (1 kecha)",
+    "priceNonNegative": "Narx 0 dan katta bo'lishi kerak",
+    "description": "Tavsif",
+    "descriptionPlaceholder": "Qisqacha tavsif...",
+    "status": "Holat",
+    "deleteConfirm": "\"{{name}}\" o'chirilsinmi?"
+  },
+  "amenities": {
+    "title": "Qulayliklar",
+    "subtitle": "Mavjud qulayliklar ro'yxati",
+    "subtitleGlobal": "Global qulayliklar ro'yxati — barcha mehmonxonalarga biriktirish mumkin",
+    "newAmenity": "Yangi qulaylik",
+    "editAmenity": "Qulaylikni tahrirlash",
+    "addAmenity": "Yangi qulaylik qo'shish",
+    "name": "Nomi",
+    "namePlaceholder": "Masalan: Wi-Fi, TV",
+    "nameRequired": "Nomi kiritilishi shart",
+    "icon": "Ikonka",
+    "notFound": "Qulayliklar topilmadi",
+    "deleteConfirm": "\"{{name}}\" o'chirilsinmi?",
+    "icons": {
+      "none": "Ikonkasiz",
+      "wind": "Konditsioner",
+      "bath": "Vanna",
+      "coffee": "Kofe",
+      "parking": "Avtoturargoh",
+      "pool": "Hovuz",
+      "gym": "Sport zal",
+      "restaurant": "Restoran",
+      "bar": "Bar",
+      "laundry": "Kir yuvish",
+      "safe": "Seyf",
+      "fridge": "Muzlatgich"
+    }
   },
   "guests": {
     "title": "Mehmonlar",
@@ -207,7 +261,12 @@
     "checkIn": "Kirish",
     "checkOut": "Chiqish",
     "bookNow": "Band qilish",
-    "booking": "Band qilinmoqda..."
+    "booking": "Band qilinmoqda...",
+    "selected": "Tanlangan",
+    "notesPlaceholder": "Qo'shimcha izohlar...",
+    "roomPrice": "Xona narxi",
+    "paymentAmount": "To'lov summasi",
+    "paymentMethodPlaceholder": "To'lov turi..."
   },
   "reservations": {
     "title": "Bronlar",
@@ -251,7 +310,12 @@
     "selectedRoom": "Tanlangan xona",
     "selectedDates": "Tanlangan sanalar",
     "noRooms": "Xonalar mavjud emas",
-    "loadingRooms": "Xonalar yuklanmoqda..."
+    "loadingRooms": "Xonalar yuklanmoqda...",
+    "payment": "To'lov",
+    "amount": "Summa",
+    "paymentAmount": "To'lov summasi",
+    "paymentMethod": "To'lov turi",
+    "notSelected": "Tanlanmagan"
   },
   "calendar": {
     "months": ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"],
@@ -332,10 +396,10 @@
     "categoryRequired": "Kategoriya kiritilishi shart",
     "categoryPlaceholder": "Masalan: FOOD, SPA, TRANSPORT",
     "description": "Tavsif",
-    "hotelId": "Mehmonxona ID",
-    "serviceId": "Xizmat ID",
-    "hotelRequired": "Mehmonxona ID kiritilishi shart",
-    "serviceRequired": "Xizmat ID kiritilishi shart",
+    "hotelId": "Mehmonxona",
+    "serviceId": "Xizmat",
+    "hotelRequired": "Mehmonxona tanlanishi shart",
+    "serviceRequired": "Xizmat tanlanishi shart",
     "priceNonNegative": "Narx manfiy bo'lmasligi kerak",
     "uuid": "UUID",
     "noServices": "Xizmatlar aniqlanmagan",
@@ -493,7 +557,8 @@
     "loading": "Yuklanmoqda...",
     "showing": "{{page}} sahifa, jami {{totalPages}} dan ({{total}} ta yozuv)",
     "previous": "Oldingi",
-    "next": "Keyingi"
+    "next": "Keyingi",
+    "som": "so'm"
   },
   "status": {
     "ACTIVE": "Faol",
@@ -519,6 +584,7 @@
     "COMPLETED": "Yakunlangan",
     "DRAFT": "Qoralama",
     "ISSUED": "Chiqarilgan",
+    "UNPAID": "To'lanmagan",
     "PARTIALLY_PAID": "Qisman to'langan",
     "PAID": "To'langan",
     "REFUNDED": "Qaytarilgan",

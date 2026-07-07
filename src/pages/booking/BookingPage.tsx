@@ -50,10 +50,9 @@ const statusColors: Record<string, string> = {
   CANCELLED: "bg-red-100 text-red-500 line-through",
 }
 
-const weekDaysUz = ["Du", "Se", "Ch", "Pa", "Ju", "Sh", "Ya"]
-
 export function BookingPage() {
   const { t } = useTranslation()
+  const weekDays = t("calendar.weekDays", { returnObjects: true }) as string[]
   const { scopeMerge, hotelId, branchId } = useScope()
   const queryClient = useQueryClient()
 
@@ -406,9 +405,9 @@ export function BookingPage() {
               <span>·</span>
               <span>{selectionStart} → {selectionEnd}</span>
               <span>·</span>
-              <span>{nightCount} {t("reservations.dates")?.toLowerCase() || "kun"}</span>
+              <span>{nightCount} {t("booking.nights")}</span>
               <span>·</span>
-              <span className="font-medium text-primary-700">{totalPrice.toLocaleString()} so'm</span>
+              <span className="font-medium text-primary-700">{totalPrice.toLocaleString()} {t("common.som")}</span>
               <button
                 onClick={clearSelection}
                 className="ml-2 p-0.5 rounded hover:bg-gray-200 text-gray-400 hover:text-gray-600"
@@ -419,7 +418,7 @@ export function BookingPage() {
           )}
           <Button onClick={openBookingModal}>
             <Plus className="h-4 w-4" />
-            Yangi band qilish
+            {t("booking.newBooking")}
           </Button>
         </div>
       </div>
@@ -440,7 +439,7 @@ export function BookingPage() {
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-sm bg-primary-100 border border-primary-300" />
-          <span>Tanlangan</span>
+          <span>{t("booking.selected")}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-sm bg-gray-400" />
@@ -463,7 +462,7 @@ export function BookingPage() {
                 style={{ width: ROOM_COL_WIDTH }}
               >
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Xonalar
+                  {t("booking.rooms")}
                 </span>
               </div>
               <div className="flex" style={{ width: calendarWidth }}>
@@ -486,7 +485,7 @@ export function BookingPage() {
                           today ? "text-primary-700" : weekend ? "text-red-400" : "text-gray-400"
                         )}
                       >
-                        {weekDaysUz[(day.getDay() + 6) % 7]}
+                        {weekDays[(day.getDay() + 6) % 7]}
                       </span>
                       <span
                         className={cn(
@@ -523,7 +522,7 @@ export function BookingPage() {
                     </span>
                     {getRoomPrice(room) > 0 && (
                       <span className="text-[10px] text-primary-600 font-medium">
-                        {getRoomPrice(room).toLocaleString()} so'm
+                        {getRoomPrice(room).toLocaleString()} {t("common.som")}
                       </span>
                     )}
                   </div>
@@ -602,7 +601,7 @@ export function BookingPage() {
                                 {getGuestName(res)}
                               </p>
                               <p className="text-[10px] opacity-80 truncate">
-                                {getStatusLabel(res.status)} · {res.check_in_date} → {res.check_out_date}
+                                {t(`status.${res.status}`, res.status)} · {res.check_in_date} → {res.check_out_date}
                               </p>
                             </div>
                           </div>
@@ -643,8 +642,8 @@ export function BookingPage() {
                                       : DAY_WIDTH,
                             }}
                           >
-                            {start && "Kirish"}
-                            {end && !start && "Chiqish"}
+                            {start && t("booking.checkIn")}
+                            {end && !start && t("booking.checkOut")}
                           </div>
                         )
                       })}
@@ -659,18 +658,18 @@ export function BookingPage() {
       {/* Footer */}
       <div className="flex-shrink-0 flex items-center justify-between px-6 py-3 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <div className="text-sm text-gray-500">
-          {rooms.length} ta xona · {format(currentMonth, "MMMM yyyy")}
+          {rooms.length} {t("booking.totalRooms")} · {format(currentMonth, "MMMM yyyy")}
         </div>
         <div className="flex items-center gap-3">
           <Button variant="secondary" onClick={clearSelection} disabled={!selectedRoom}>
-            Bekor qilish
+            {t("booking.cancel")}
           </Button>
           <Button
             onClick={openBookingModal}
             disabled={!selectedRoom || !selectionStart || !selectionEnd}
           >
             <CheckCircle2 className="h-4 w-4" />
-            Tasdiqlash
+            {t("booking.confirm")}
           </Button>
         </div>
       </div>
@@ -683,7 +682,7 @@ export function BookingPage() {
           setShowNewGuest(false)
           setSelectedGuestId("")
         }}
-        title="Yangi band qilish"
+        title={t("booking.newBooking")}
         size="lg"
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -701,7 +700,7 @@ export function BookingPage() {
                 </p>
                 {selectionStart && selectionEnd && (
                   <p className="text-xs text-gray-500">
-                    {selectionStart} → {selectionEnd} ({nightCount} kun)
+                    {selectionStart} → {selectionEnd} ({nightCount} {t("booking.nights")})
                   </p>
                 )}
               </div>
@@ -711,14 +710,14 @@ export function BookingPage() {
           <div className="grid grid-cols-2 gap-4">
             <Input
               id="check_in_date"
-              label="Kirish sanasi *"
+              label={t("reservations.checkInDate") + " *"}
               type="date"
               error={errors.check_in_date?.message}
               {...register("check_in_date")}
             />
             <Input
               id="check_out_date"
-              label="Chiqish sanasi *"
+              label={t("reservations.checkOutDate") + " *"}
               type="date"
               error={errors.check_out_date?.message}
               {...register("check_out_date")}
@@ -728,7 +727,7 @@ export function BookingPage() {
           {/* Guest selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Mehmon *
+              {t("reservations.guest")} *
             </label>
 
             {!showNewGuest ? (
@@ -738,7 +737,7 @@ export function BookingPage() {
                   <input
                     type="text"
                     className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="Mehmon qidirish..."
+                    placeholder={t("booking.searchGuest")}
                     value={guestSearch}
                     onChange={(e) => setGuestSearch(e.target.value)}
                   />
@@ -768,7 +767,7 @@ export function BookingPage() {
                   ))}
                   {filteredGuests.length === 0 && (
                     <p className="px-3 py-4 text-sm text-gray-400 text-center">
-                      Mehmon topilmadi
+                      {t("booking.noGuests")}
                     </p>
                   )}
                 </div>
@@ -777,7 +776,7 @@ export function BookingPage() {
                   className="text-sm text-primary-600 hover:text-primary-700 font-medium"
                   onClick={() => setShowNewGuest(true)}
                 >
-                  + Yangi mehmon qo'shish
+                  + {t("booking.newGuest")}
                 </button>
               </div>
             ) : (
@@ -785,20 +784,20 @@ export function BookingPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <Input
                     id="new_guest_first_name"
-                    label="Ism *"
-                    placeholder="Ism"
+                    label={t("guests.firstName") + " *"}
+                    placeholder={t("guests.firstName")}
                     {...register("new_guest_first_name")}
                   />
                   <Input
                     id="new_guest_last_name"
-                    label="Familiya"
-                    placeholder="Familiya"
+                    label={t("guests.lastName")}
+                    placeholder={t("guests.lastName")}
                     {...register("new_guest_last_name")}
                   />
                 </div>
                 <Input
                   id="new_guest_phone"
-                  label="Telefon"
+                  label={t("guests.phone")}
                   placeholder="+998"
                   {...register("new_guest_phone")}
                 />
@@ -812,7 +811,7 @@ export function BookingPage() {
                     setValue("new_guest_phone", "")
                   }}
                 >
-                  ← Mavjud mehmonni tanlash
+                  ← {t("booking.existingGuest")}
                 </button>
               </div>
             )}
@@ -824,14 +823,14 @@ export function BookingPage() {
           <div className="grid grid-cols-2 gap-4">
             <Input
               id="adults"
-              label="Kattalar"
+              label={t("reservations.adults")}
               type="number"
               error={errors.adults?.message}
               {...register("adults", { valueAsNumber: true })}
             />
             <Input
               id="children"
-              label="Bolalar"
+              label={t("reservations.children")}
               type="number"
               {...register("children", { valueAsNumber: true })}
             />
@@ -839,19 +838,19 @@ export function BookingPage() {
 
           <Input
             id="notes"
-            label="Izohlar"
-            placeholder="Qo'shimcha izohlar..."
+            label={t("reservations.notes")}
+            placeholder={t("booking.notesPlaceholder")}
             {...register("notes")}
           />
 
           <div className="p-3 bg-gray-50 rounded-lg space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Xona narxi ({nightCount} kun)</span>
-              <span className="text-sm font-semibold text-gray-900">{totalPrice.toLocaleString()} so'm</span>
+              <span className="text-sm text-gray-600">{t("booking.roomPrice")} ({nightCount} {t("booking.nights")})</span>
+              <span className="text-sm font-semibold text-gray-900">{totalPrice.toLocaleString()} {t("common.som")}</span>
             </div>
             <div className="border-t border-gray-200 pt-3">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                To'lov summasi
+                {t("booking.paymentAmount")}
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <Input
@@ -867,13 +866,13 @@ export function BookingPage() {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   {...register("payment_method")}
                 >
-                  <option value="">To'lov turi...</option>
-                  <option value="CASH">Naqd</option>
-                  <option value="CREDIT_CARD">Kredit karta</option>
-                  <option value="DEBIT_CARD">Debet karta</option>
-                  <option value="BANK_TRANSFER">Bank o'tkazmasi</option>
-                  <option value="MOBILE_PAYMENT">Mobil to'lov</option>
-                  <option value="ONLINE">Online</option>
+                  <option value="">{t("booking.paymentMethodPlaceholder")}</option>
+                  <option value="CASH">{t("status.CASH")}</option>
+                  <option value="CREDIT_CARD">{t("status.CREDIT_CARD")}</option>
+                  <option value="DEBIT_CARD">{t("status.DEBIT_CARD")}</option>
+                  <option value="BANK_TRANSFER">{t("status.BANK_TRANSFER")}</option>
+                  <option value="MOBILE_PAYMENT">{t("status.MOBILE_PAYMENT")}</option>
+                  <option value="ONLINE">{t("status.ONLINE")}</option>
                 </select>
               </div>
             </div>
@@ -889,28 +888,16 @@ export function BookingPage() {
                 setSelectedGuestId("")
               }}
             >
-              Bekor qilish
+              {t("booking.cancel")}
             </Button>
             <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending ? "Yaratilmoqda..." : "Band qilish"}
+              {createMutation.isPending ? t("booking.booking") : t("booking.bookNow")}
             </Button>
           </div>
         </form>
       </Modal>
     </div>
   )
-}
-
-function getStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    PENDING: "Kutilmoqda",
-    CONFIRMED: "Tasdiqlangan",
-    CHECKED_IN: "Kirgan",
-    CHECKED_OUT: "Chiqgan",
-    NO_SHOW: "Kelmadi",
-    CANCELLED: "Bekor qilingan",
-  }
-  return labels[status] || status
 }
 
 function dayDiff(start: string, end: string): number {

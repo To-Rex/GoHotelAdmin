@@ -24,8 +24,10 @@ import {
 } from "@/api/modules/rooms"
 import type { RoomType } from "@/types/room"
 import { useScope } from "@/hooks/useScope"
+import { useTranslation } from "react-i18next"
 
 export function RoomTypesPage() {
+  const { t } = useTranslation()
   const { isSuperAdmin } = useScope()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
@@ -33,9 +35,9 @@ export function RoomTypesPage() {
   const [editingType, setEditingType] = useState<RoomType | null>(null)
 
   const roomTypeSchema = z.object({
-    name: z.string().min(1, "Nomi talab qilinadi"),
+    name: z.string().min(1, t("roomTypes.nameRequired")),
     description: z.string().optional(),
-    base_price: z.number().min(0, "Narx 0 dan katta bo'lishi kerak"),
+    base_price: z.number().min(0, t("roomTypes.priceNonNegative")),
   })
 
   type RoomTypeForm = z.infer<typeof roomTypeSchema>
@@ -130,7 +132,7 @@ export function RoomTypesPage() {
   const columns: Column<RoomType>[] = [
     {
       key: "name",
-      header: "Nomi",
+      header: t("roomTypes.name"),
       render: (rt) => (
         <div className="flex items-center gap-2">
           <DollarSign className="h-4 w-4 text-primary-500" />
@@ -140,23 +142,23 @@ export function RoomTypesPage() {
     },
     {
       key: "base_price",
-      header: "Default narx",
+      header: t("roomTypes.basePrice"),
       render: (rt) => (
         <span className="font-semibold text-primary-700">
-          {rt.base_price > 0 ? `${rt.base_price.toLocaleString()} so'm` : "—"}
+          {rt.base_price > 0 ? `${rt.base_price.toLocaleString()} ${t("common.som")}` : "—"}
         </span>
       ),
     },
     {
       key: "description",
-      header: "Tavsif",
+      header: t("roomTypes.description"),
       render: (rt) => (
         <span className="text-sm text-gray-500">{rt.description || "—"}</span>
       ),
     },
     {
       key: "is_active",
-      header: "Holat",
+      header: t("roomTypes.status"),
       render: (rt) =>
         isSuperAdmin ? (
           <button
@@ -184,7 +186,7 @@ export function RoomTypesPage() {
                     openEdit(rt)
                   }}
                 >
-                  Tahrirlash
+                  {t("common.edit")}
                 </Button>
                 <Button
                   variant="ghost"
@@ -192,12 +194,12 @@ export function RoomTypesPage() {
                   className="text-red-600"
                   onClick={(e) => {
                     e.stopPropagation()
-                    if (confirm(`"${rt.name}" o'chirilsinmi?`)) {
+                    if (confirm(t("roomTypes.deleteConfirm", { name: rt.name }))) {
                       deleteMutation.mutate(rt.id)
                     }
                   }}
                 >
-                  O'chirish
+                  {t("common.delete")}
                 </Button>
               </div>
             ),
@@ -212,17 +214,15 @@ export function RoomTypesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Xona turlari</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("roomTypes.title")}</h1>
           <p className="text-gray-500 mt-1">
-            {isSuperAdmin
-              ? "Global xona turlari — mehmonxonalarga biriktirish mumkin. Qulayliklar alohida bo'limda boshqariladi"
-              : "Mavjud xona turlari ro'yxati"}
+            {isSuperAdmin ? t("roomTypes.subtitleGlobal") : t("roomTypes.subtitle")}
           </p>
         </div>
         {isSuperAdmin && (
           <Button onClick={openCreate}>
             <Plus className="h-4 w-4" />
-            Yangi tur qo'shish
+            {t("roomTypes.newType")}
           </Button>
         )}
       </div>
@@ -235,7 +235,7 @@ export function RoomTypesPage() {
             keyField="id"
             isLoading={isLoading}
             searchable
-            searchPlaceholder="Qidirish..."
+            searchPlaceholder={t("common.search")}
             onSearch={setSearch}
           />
         </CardContent>
@@ -247,28 +247,26 @@ export function RoomTypesPage() {
           setModalOpen(false)
           setEditingType(null)
         }}
-        title={
-          editingType ? "Xona turini tahrirlash" : "Yangi xona turi qo'shish"
-        }
+        title={editingType ? t("roomTypes.editType") : t("roomTypes.addType")}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
             id="name"
-            label="Nomi *"
-            placeholder="Masalan: Deluxe, Standart"
+            label={t("roomTypes.name") + " *"}
+            placeholder={t("roomTypes.namePlaceholder")}
             error={errors.name?.message}
             {...register("name")}
           />
           <Input
             id="description"
-            label="Tavsif"
-            placeholder="Qisqacha tavsif..."
+            label={t("roomTypes.description")}
+            placeholder={t("roomTypes.descriptionPlaceholder")}
             error={errors.description?.message}
             {...register("description")}
           />
           <Input
             id="base_price"
-            label="Default narx (1 kecha) *"
+            label={t("roomTypes.basePriceLabel") + " *"}
             type="number"
             placeholder="0"
             error={errors.base_price?.message}
@@ -283,13 +281,13 @@ export function RoomTypesPage() {
                 setEditingType(null)
               }}
             >
-              Bekor qilish
+              {t("common.cancel")}
             </Button>
             <Button
               type="submit"
               disabled={createMutation.isPending || updateMutation.isPending}
             >
-              {editingType ? "Yangilash" : "Yaratish"}
+              {editingType ? t("common.update") : t("common.create")}
             </Button>
           </div>
         </form>
