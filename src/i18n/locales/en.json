@@ -9,6 +9,9 @@
     "signIn": "Sign in",
     "signingIn": "Signing in...",
     "invalidCredentials": "Invalid username or password",
+    "accessDenied": "You are not an admin. Your credentials are correct, but you don't have permission to access this panel",
+    "accessDeniedTitle": "Access denied",
+    "backToLogin": "Back to login",
     "usernameRequired": "Username is required",
     "passwordRequired": "Password is required"
   },

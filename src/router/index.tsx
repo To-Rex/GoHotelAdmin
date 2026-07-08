@@ -5,6 +5,7 @@ import { AuthGuard, GuestGuard, SuperAdminGuard } from "@/components/shared/Auth
 import { PageLoader } from "@/components/ui"
 
 const LoginPage = lazy(() => import("@/pages/auth/LoginPage").then((m) => ({ default: m.LoginPage })))
+const AccessDeniedPage = lazy(() => import("@/pages/auth/AccessDeniedPage").then((m) => ({ default: m.AccessDeniedPage })))
 const DashboardPage = lazy(() => import("@/pages/dashboard/DashboardPage").then((m) => ({ default: m.DashboardPage })))
 const HotelsPage = lazy(() => import("@/pages/hotels/HotelsPage").then((m) => ({ default: m.HotelsPage })))
 const BranchesPage = lazy(() => import("@/pages/branches/BranchesPage").then((m) => ({ default: m.BranchesPage })))
@@ -36,6 +37,16 @@ export const router = createBrowserRouter([
       <GuestGuard>
         <LazyFallback>
           <LoginPage />
+        </LazyFallback>
+      </GuestGuard>
+    ),
+  },
+  {
+    path: "/access-denied",
+    element: (
+      <GuestGuard>
+        <LazyFallback>
+          <AccessDeniedPage />
         </LazyFallback>
       </GuestGuard>
     ),

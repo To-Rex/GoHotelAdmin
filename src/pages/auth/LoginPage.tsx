@@ -36,8 +36,12 @@ export function LoginPage() {
     try {
       await login(data.username, data.password)
       navigate("/")
-    } catch {
-      setError(t("auth.invalidCredentials"))
+    } catch (e) {
+      if (e instanceof Error && e.message === "ACCESS_DENIED") {
+        navigate("/access-denied")
+      } else {
+        setError(t("auth.invalidCredentials"))
+      }
     } finally {
       setIsSubmitting(false)
     }

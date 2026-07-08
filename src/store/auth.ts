@@ -29,24 +29,46 @@ export const useAuthStore = create<AuthState>()(
 
       login: async (username, password) => {
         set({ isLoading: true })
+        let data
         try {
-          const data = await authApi.login({ username, password })
-          set({
-            token: data.access_token,
-            refreshToken: data.refresh_token,
-            isAuthenticated: true,
-            isLoading: false,
-          })
-          try {
-            const user = await authApi.getMe()
-            set({ user })
-          } catch {
-            // user profile fetch failed but login succeeded
-          }
+          data = await authApi.login({ username, password })
         } catch {
           set({ isLoading: false })
           throw new Error("Invalid credentials")
         }
+
+        set({
+          token: data.access_token,
+          refreshToken: data.refresh_token,
+        })
+
+        let user = data.user ?? null
+        if (!user) {
+          try {
+            user = await authApi.getMe()
+          } catch {
+            user = null
+          }
+        }
+
+        // only SUPER_ADMIN is allowed into the admin panel
+        if (!user || user.user_type !== "SUPER_ADMIN") {
+          try {
+            await authApi.logout()
+          } catch {
+            // ignore - token may already be invalid
+          }
+          set({
+            token: null,
+            refreshToken: null,
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+          })
+          throw new Error("ACCESS_DENIED")
+        }
+
+        set({ user, isAuthenticated: true, isLoading: false })
       },
 
       logout: async () => {
@@ -75,6 +97,10 @@ export const useAuthStore = create<AuthState>()(
       fetchProfile: async () => {
         try {
           const user = await authApi.getMe()
+          if (user.user_type !== "SUPER_ADMIN") {
+            get().clearAuth()
+            return
+          }
           set({ user, isAuthenticated: true })
         } catch {
           set({
@@ -94,6 +120,16 @@ export const useAuthStore = create<AuthState>()(
         }
         try {
           const user = await authApi.getMe()
+          if (user.user_type !== "SUPER_ADMIN") {
+            set({
+              token: null,
+              refreshToken: null,
+              user: null,
+              isAuthenticated: false,
+              isInitialized: true,
+            })
+            return
+          }
           set({ user, isAuthenticated: true, isInitialized: true })
         } catch {
           set({

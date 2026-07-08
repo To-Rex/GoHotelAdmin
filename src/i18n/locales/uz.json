@@ -9,6 +9,9 @@
     "signIn": "Kirish",
     "signingIn": "Kirmoqda...",
     "invalidCredentials": "Noto'g'ri foydalanuvchi nomi yoki parol",
+    "accessDenied": "Siz admin emassiz. Login va parol to'g'ri, lekin bu panelga kirish huquqingiz yo'q",
+    "accessDeniedTitle": "Ruxsat yo'q",
+    "backToLogin": "Kirish sahifasiga qaytish",
     "usernameRequired": "Foydalanuvchi nomi kiritilishi shart",
     "passwordRequired": "Parol kiritilishi shart"
   },
