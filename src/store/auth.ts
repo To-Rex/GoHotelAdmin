@@ -42,7 +42,7 @@ export const useAuthStore = create<AuthState>()(
           refreshToken: data.refresh_token,
         })
 
-        let user = data.user ?? null
+        let user: UserProfile | null = data.user ?? null
         if (!user) {
           try {
             user = await authApi.getMe()
