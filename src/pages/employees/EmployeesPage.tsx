@@ -62,7 +62,7 @@ export function EmployeesPage() {
 
   const { data: branchesData } = useQuery({
     queryKey: ["branches", "dropdown"],
-    queryFn: () => getBranches({ page_size: "500" }),
+    queryFn: () => getBranches(scopeMerge({ page_size: "500" })),
   })
 
   const hotelsList = useMemo(() => {
@@ -153,6 +153,21 @@ export function EmployeesPage() {
   const watchedHotelId = watch("hotel_id")
   const hotelField = register("hotel_id")
 
+  const { data: hotelBranchesData } = useQuery({
+    queryKey: ["branches", "select", watchedHotelId],
+    queryFn: () => {
+      const params: Record<string, string> = { page_size: "500" }
+      if (isSuperAdmin && watchedHotelId) params.hotel_id = watchedHotelId
+      return getBranches(scopeMerge(params))
+    },
+    enabled: isSuperAdmin ? !!watchedHotelId : true,
+  })
+
+  const hotelBranches = useMemo(() => {
+    const raw = (hotelBranchesData as any)?.data ?? hotelBranchesData ?? []
+    return Array.isArray(raw) ? raw : (raw as any)?.items ?? []
+  }, [hotelBranchesData])
+
   const branchNameMap = useMemo(() => {
     const map = new Map<string, string>()
     for (const b of allBranches) map.set(b.id, b.name)
@@ -161,7 +176,7 @@ export function EmployeesPage() {
 
   const hotelOptions = hotelsList.map((h: any) => ({ value: h.id, label: h.name }))
 
-  const branchOptions = allBranches
+  const branchOptions = hotelBranches
     .filter((b: any) => !watchedHotelId || b.hotel_id === watchedHotelId)
     .map((b: any) => ({ value: b.id, label: b.name }))
 
