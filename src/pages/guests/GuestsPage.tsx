@@ -114,12 +114,16 @@ export function GuestsPage() {
   })
 
   const openCreate = () => {
+    createMutation.reset()
+    updateMutation.reset()
     reset({ first_name: "", last_name: "", hotel_id: hotelId || "" })
     setEditingGuest(null)
     setModalOpen(true)
   }
 
   const openEdit = (guest: Guest) => {
+    createMutation.reset()
+    updateMutation.reset()
     reset({
       hotel_id: guest.hotel_id,
       first_name: guest.first_name,
@@ -139,12 +143,24 @@ export function GuestsPage() {
   }
 
   const onSubmit = (values: GuestForm) => {
+    // drop empty optional fields — backend rejects "" for dates/emails
+    const payload = Object.fromEntries(
+      Object.entries(values).filter(([, v]) => v !== "" && v !== undefined)
+    ) as unknown
     if (editingGuest) {
-      updateMutation.mutate({ id: editingGuest.id, data: values as GuestUpdateRequest })
+      updateMutation.mutate({ id: editingGuest.id, data: payload as GuestUpdateRequest })
     } else {
-      createMutation.mutate(values as GuestCreateRequest)
+      createMutation.mutate(payload as GuestCreateRequest)
     }
   }
+
+  const mutationError = createMutation.error || updateMutation.error
+  const rawDetail = (mutationError as any)?.response?.data?.detail
+  const errorMessage = mutationError
+    ? Array.isArray(rawDetail)
+      ? rawDetail.map((d: any) => d?.msg ?? JSON.stringify(d)).join("; ")
+      : (rawDetail ?? (mutationError as any)?.message ?? String(mutationError))
+    : null
 
   const hotelsList: Hotel[] =
     hotelsData?.items ?? (Array.isArray(hotelsData) ? hotelsData : [])
@@ -300,6 +316,12 @@ export function GuestsPage() {
 
           <Input id="address" label={t("guests.address")} {...register("address")} />
           <Input id="notes" label={t("guests.notes")} {...register("notes")} />
+
+          {errorMessage && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="secondary" onClick={() => setModalOpen(false)}>
