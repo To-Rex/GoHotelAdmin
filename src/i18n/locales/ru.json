@@ -27,19 +27,7 @@
     "noReservations": "Бронирований пока нет",
     "noInvoices": "Счетов пока нет",
     "status": "Статус",
-    "na": "Н/Д",
-    "occupancy": "Загруженность",
-    "roomsOccupied": "номеров занято",
-    "todayCheckIns": "Заезды сегодня",
-    "todayCheckOuts": "Выезды сегодня",
-    "openTasks": "Открытые задачи уборки",
-    "roomStatus": "Статусы номеров",
-    "reservationStatus": "Статусы бронирований",
-    "finance": "Финансы",
-    "paidTotal": "Оплачено всего",
-    "outstanding": "Не оплачено",
-    "totalInvoices": "Всего счетов",
-    "noData": "Нет данных"
+    "na": "Н/Д"
   },
   "header": {
     "adminPanel": "Админ панель"

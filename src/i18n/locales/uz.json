@@ -27,19 +27,7 @@
     "noReservations": "Hozircha bronlar yo'q",
     "noInvoices": "Hozircha hisob-fakturalar yo'q",
     "status": "Holat",
-    "na": "Mavjud emas",
-    "occupancy": "Bandlik",
-    "roomsOccupied": "xona band",
-    "todayCheckIns": "Bugungi kelishlar",
-    "todayCheckOuts": "Bugungi ketishlar",
-    "openTasks": "Ochiq tozalash vazifalari",
-    "roomStatus": "Xonalar holati",
-    "reservationStatus": "Bronlar holati",
-    "finance": "Moliya",
-    "paidTotal": "To'langan jami",
-    "outstanding": "To'lanmagan qoldiq",
-    "totalInvoices": "Jami hisob-fakturalar",
-    "noData": "Ma'lumot yo'q"
+    "na": "Mavjud emas"
   },
   "header": {
     "adminPanel": "Admin Panel"

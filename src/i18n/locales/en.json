@@ -27,19 +27,7 @@
     "noReservations": "No reservations yet",
     "noInvoices": "No invoices yet",
     "status": "Status",
-    "na": "N/A",
-    "occupancy": "Occupancy",
-    "roomsOccupied": "rooms occupied",
-    "todayCheckIns": "Today's Check-ins",
-    "todayCheckOuts": "Today's Check-outs",
-    "openTasks": "Open Housekeeping Tasks",
-    "roomStatus": "Room Status",
-    "reservationStatus": "Reservation Status",
-    "finance": "Finance",
-    "paidTotal": "Total Paid",
-    "outstanding": "Outstanding",
-    "totalInvoices": "Total Invoices",
-    "noData": "No data"
+    "na": "N/A"
   },
   "header": {
     "adminPanel": "Admin Panel"
