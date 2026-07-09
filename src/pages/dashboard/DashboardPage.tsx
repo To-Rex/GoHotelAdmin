@@ -356,13 +356,13 @@ export function DashboardPage() {
               <div>
                 <p className="text-sm text-gray-500">{t("dashboard.paidTotal")}</p>
                 <p className="mt-1 text-2xl font-semibold text-gray-900">
-                  ${paidTotal.toLocaleString()}
+                  {paidTotal.toLocaleString()} {t("common.som")}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">{t("dashboard.outstanding")}</p>
                 <p className="mt-1 text-2xl font-semibold text-gray-900">
-                  ${outstandingTotal.toLocaleString()}
+                  {outstandingTotal.toLocaleString()} {t("common.som")}
                 </p>
               </div>
               {financeTotal > 0 && (
@@ -452,7 +452,7 @@ export function DashboardPage() {
                     <div className="flex items-center gap-3 shrink-0">
                       <Badge variant={String(inv.status)} />
                       <span className="text-sm font-semibold text-gray-900 tabular-nums">
-                        ${Number(inv.total_amount).toLocaleString()}
+                        {Number(inv.total_amount).toLocaleString()} {t("common.som")}
                       </span>
                     </div>
                   </div>
