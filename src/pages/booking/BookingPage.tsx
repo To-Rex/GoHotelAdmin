@@ -416,7 +416,11 @@ export function BookingPage() {
               </button>
             </div>
           )}
-          <Button onClick={openBookingModal}>
+          <Button
+            onClick={openBookingModal}
+            disabled={!selectedRoom || !selectionStart || !selectionEnd}
+            className="disabled:opacity-100 disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none"
+          >
             <Plus className="h-4 w-4" />
             {t("booking.newBooking")}
           </Button>
@@ -667,6 +671,7 @@ export function BookingPage() {
           <Button
             onClick={openBookingModal}
             disabled={!selectedRoom || !selectionStart || !selectionEnd}
+            className="disabled:opacity-100 disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none"
           >
             <CheckCircle2 className="h-4 w-4" />
             {t("booking.confirm")}
