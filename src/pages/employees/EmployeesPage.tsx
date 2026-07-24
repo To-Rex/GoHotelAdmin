@@ -25,10 +25,12 @@ import type { Employee, EmployeeCreateRequest } from "@/types/auth"
 import { formatDate, cn } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { useScope } from "@/hooks/useScope"
+import { usePermissions } from "@/lib/permissions"
 
 export function EmployeesPage() {
   const { t } = useTranslation()
   const { scopeMerge, isSuperAdmin, hotelId } = useScope()
+  const { can } = usePermissions()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [expandedHotels, setExpandedHotels] = useState<Set<string>>(new Set())
@@ -230,10 +232,12 @@ export function EmployeesPage() {
           <h1 className="text-2xl font-bold text-gray-900">{t("employees.title")}</h1>
           <p className="text-gray-500 mt-1">{t("employees.subtitle")}</p>
         </div>
-        <Button onClick={() => openCreate()}>
-          <Plus className="h-4 w-4" />
-          {t("employees.addEmployee")}
-        </Button>
+        {can("employee.create") && (
+          <Button onClick={() => openCreate()}>
+            <Plus className="h-4 w-4" />
+            {t("employees.addEmployee")}
+          </Button>
+        )}
       </div>
 
       <div className="relative">
@@ -279,17 +283,19 @@ export function EmployeesPage() {
                 <span className="text-xs text-gray-400 shrink-0">
                   {employees.length} {t("employees.title")}
                 </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (!isExpanded) toggleHotel(hotel.id)
-                    openCreate(hotel.id)
-                  }}
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                </Button>
+                {can("employee.create") && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (!isExpanded) toggleHotel(hotel.id)
+                      openCreate(hotel.id)
+                    }}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </Button>
+                )}
               </button>
 
               {isExpanded && (
@@ -335,24 +341,28 @@ export function EmployeesPage() {
                             {emp.branch_id ? (branchNameMap.get(emp.branch_id) || "-") : "-"}
                           </span>
                           <span className="col-span-2 flex gap-1 justify-end">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => openEdit(emp)}
-                            >
-                              {t("employees.edit")}
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-red-600"
-                              onClick={() => {
-                                if (confirm(t("employees.deleteConfirm")))
-                                  deleteMutation.mutate(emp.id)
-                              }}
-                            >
-                              {t("employees.delete")}
-                            </Button>
+                            {can("employee.update") && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => openEdit(emp)}
+                              >
+                                {t("employees.edit")}
+                              </Button>
+                            )}
+                            {can("employee.delete") && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-600"
+                                onClick={() => {
+                                  if (confirm(t("employees.deleteConfirm")))
+                                    deleteMutation.mutate(emp.id)
+                                }}
+                              >
+                                {t("employees.delete")}
+                              </Button>
+                            )}
                           </span>
                         </div>
                       ))}

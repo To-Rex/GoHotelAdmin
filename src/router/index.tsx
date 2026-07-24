@@ -12,6 +12,7 @@ const BranchesPage = lazy(() => import("@/pages/branches/BranchesPage").then((m)
 const RoomsPage = lazy(() => import("@/pages/rooms/RoomsPage").then((m) => ({ default: m.RoomsPage })))
 const RoomTypesPage = lazy(() => import("@/pages/rooms/RoomTypesPage").then((m) => ({ default: m.RoomTypesPage })))
 const AmenitiesPage = lazy(() => import("@/pages/rooms/AmenitiesPage").then((m) => ({ default: m.AmenitiesPage })))
+const FloorsPage = lazy(() => import("@/pages/floors/FloorsPage").then((m) => ({ default: m.FloorsPage })))
 const GuestsPage = lazy(() => import("@/pages/guests/GuestsPage").then((m) => ({ default: m.GuestsPage })))
 const ReservationsPage = lazy(() => import("@/pages/reservations/ReservationsPage").then((m) => ({ default: m.ReservationsPage })))
 const BookingPage = lazy(() => import("@/pages/booking/BookingPage").then((m) => ({ default: m.BookingPage })))
@@ -65,6 +66,7 @@ export const router = createBrowserRouter([
       { path: "rooms", element: <LazyFallback><RoomsPage /></LazyFallback> },
       { path: "room-types", element: <LazyFallback><RoomTypesPage /></LazyFallback> },
       { path: "amenities", element: <LazyFallback><AmenitiesPage /></LazyFallback> },
+      { path: "floors", element: <LazyFallback><FloorsPage /></LazyFallback> },
       { path: "guests", element: <LazyFallback><GuestsPage /></LazyFallback> },
       { path: "reservations", element: <LazyFallback><ReservationsPage /></LazyFallback> },
       { path: "booking", element: <LazyFallback><BookingPage /></LazyFallback> },

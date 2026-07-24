@@ -31,11 +31,13 @@ import { formatDate, cn } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { ReservationCalendar } from "./ReservationCalendar"
 import { useScope } from "@/hooks/useScope"
+import { usePermissions } from "@/lib/permissions"
 
 export function ReservationsPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { scopeMerge, isSuperAdmin, hotelId, branchId } = useScope()
+  const { can } = usePermissions()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
@@ -280,7 +282,7 @@ export function ReservationsPage() {
       header: "",
       render: (r) => (
         <div className="flex gap-1">
-          {r.status === "CONFIRMED" && (
+          {r.status === "CONFIRMED" && can("guest.checkin") && (
             <Button
               variant="ghost"
               size="sm"
@@ -291,7 +293,7 @@ export function ReservationsPage() {
               {t("reservations.checkIn")}
             </Button>
           )}
-          {r.status === "CHECKED_IN" && (
+          {r.status === "CHECKED_IN" && can("guest.checkout") && (
             <Button
               variant="ghost"
               size="sm"
@@ -302,7 +304,7 @@ export function ReservationsPage() {
               {t("reservations.checkOut")}
             </Button>
           )}
-          {(r.status === "PENDING" || r.status === "CONFIRMED") && (
+          {(r.status === "PENDING" || r.status === "CONFIRMED") && can("reservation.cancel") && (
             <Button
               variant="ghost"
               size="sm"
@@ -344,18 +346,20 @@ export function ReservationsPage() {
               <span className="text-xs text-gray-400 shrink-0">
                 {branches.length} {t("rooms.branch")} / {totalReservations} {t("reservations.title")}
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  if (!isHotelExpanded) toggleHotel(hotel.id)
-                  const firstBranch = branches[0]
-                  openCreate(hotel.id, firstBranch?.branch.id)
-                }}
-              >
-                <Plus className="h-3.5 w-3.5" />
-              </Button>
+              {can("reservation.create") && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (!isHotelExpanded) toggleHotel(hotel.id)
+                    const firstBranch = branches[0]
+                    openCreate(hotel.id, firstBranch?.branch.id)
+                  }}
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </Button>
+              )}
             </button>
 
             {isHotelExpanded && (
@@ -388,17 +392,19 @@ export function ReservationsPage() {
                             <span className="text-xs text-gray-400 ml-auto shrink-0">
                               {branchRes.length} {t("reservations.title")}
                             </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                if (!isBranchExpanded) toggleBranch(branch.id)
-                                openCreate(hotel.id, branch.id)
-                              }}
-                            >
-                              <Plus className="h-3.5 w-3.5" />
-                            </Button>
+                            {can("reservation.create") && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  if (!isBranchExpanded) toggleBranch(branch.id)
+                                  openCreate(hotel.id, branch.id)
+                                }}
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
                           </button>
 
                           {isBranchExpanded && (
@@ -454,7 +460,7 @@ export function ReservationsPage() {
                                         {r.total_amount > 0 ? `${r.total_amount.toLocaleString()} ${t("common.som")}` : "—"}
                                       </span>
                                       <span className="col-span-2 flex gap-1 justify-end">
-                                        {r.status === "CONFIRMED" && (
+                                        {r.status === "CONFIRMED" && can("guest.checkin") && (
                                           <Button
                                             variant="ghost"
                                             size="sm"
@@ -465,7 +471,7 @@ export function ReservationsPage() {
                                             {t("reservations.checkIn")}
                                           </Button>
                                         )}
-                                        {r.status === "CHECKED_IN" && (
+                                        {r.status === "CHECKED_IN" && can("guest.checkout") && (
                                           <Button
                                             variant="ghost"
                                             size="sm"
@@ -476,7 +482,7 @@ export function ReservationsPage() {
                                             {t("reservations.checkOut")}
                                           </Button>
                                         )}
-                                        {(r.status === "PENDING" || r.status === "CONFIRMED") && (
+                                        {(r.status === "PENDING" || r.status === "CONFIRMED") && can("reservation.cancel") && (
                                           <Button
                                             variant="ghost"
                                             size="sm"
@@ -548,10 +554,12 @@ export function ReservationsPage() {
               {t("reservations.calendarView")}
             </button>
           </div>
-          <Button onClick={() => navigate("/booking")}>
-            <Plus className="h-4 w-4" />
-            {t("reservations.newReservation")}
-          </Button>
+          {can("reservation.create") && (
+            <Button onClick={() => navigate("/booking")}>
+              <Plus className="h-4 w-4" />
+              {t("reservations.newReservation")}
+            </Button>
+          )}
         </div>
       </div>
 

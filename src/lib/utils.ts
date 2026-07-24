@@ -5,6 +5,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/** Human-readable message from an axios/FastAPI error, or null when there is none. */
+export function apiErrorMessage(error: unknown): string | null {
+  if (!error) return null
+  const detail = (error as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail
+  if (Array.isArray(detail)) {
+    return detail
+      .map((d) => (d as { msg?: string })?.msg ?? JSON.stringify(d))
+      .join("; ")
+  }
+  if (typeof detail === "string") return detail
+  return (error as { message?: string })?.message ?? String(error)
+}
+
 function getLocale(): string {
   try {
     const stored = localStorage.getItem("gohotel-lang")

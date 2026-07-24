@@ -24,11 +24,16 @@ import {
 } from "@/api/modules/rooms"
 import type { RoomType } from "@/types/room"
 import { useScope } from "@/hooks/useScope"
+import { usePermissions } from "@/lib/permissions"
 import { useTranslation } from "react-i18next"
 
 export function RoomTypesPage() {
   const { t } = useTranslation()
   const { isSuperAdmin } = useScope()
+  const { can } = usePermissions()
+  const canCreate = can("room_type.create")
+  const canEdit = can("room_type.update")
+  const canDelete = can("room_type.delete")
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [modalOpen, setModalOpen] = useState(false)
@@ -160,7 +165,7 @@ export function RoomTypesPage() {
       key: "is_active",
       header: t("roomTypes.status"),
       render: (rt) =>
-        isSuperAdmin ? (
+        canEdit ? (
           <button
             onClick={() => toggleStatus(rt.id, rt.is_active)}
             className="cursor-pointer"
@@ -171,36 +176,40 @@ export function RoomTypesPage() {
           <Badge variant={rt.is_active ? "ACTIVE" : "INACTIVE"} />
         ),
     },
-    ...(isSuperAdmin
+    ...(canEdit || canDelete
       ? [
           {
             key: "actions" as string,
             header: "",
             render: (rt: RoomType) => (
               <div className="flex gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    openEdit(rt)
-                  }}
-                >
-                  {t("common.edit")}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-red-600"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (confirm(t("roomTypes.deleteConfirm", { name: rt.name }))) {
-                      deleteMutation.mutate(rt.id)
-                    }
-                  }}
-                >
-                  {t("common.delete")}
-                </Button>
+                {canEdit && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openEdit(rt)
+                    }}
+                  >
+                    {t("common.edit")}
+                  </Button>
+                )}
+                {canDelete && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-600"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (confirm(t("roomTypes.deleteConfirm", { name: rt.name }))) {
+                        deleteMutation.mutate(rt.id)
+                      }
+                    }}
+                  >
+                    {t("common.delete")}
+                  </Button>
+                )}
               </div>
             ),
           },
@@ -219,7 +228,7 @@ export function RoomTypesPage() {
             {isSuperAdmin ? t("roomTypes.subtitleGlobal") : t("roomTypes.subtitle")}
           </p>
         </div>
-        {isSuperAdmin && (
+        {canCreate && (
           <Button onClick={openCreate}>
             <Plus className="h-4 w-4" />
             {t("roomTypes.newType")}

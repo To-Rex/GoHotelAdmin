@@ -67,7 +67,8 @@
     "payments": "To'lovlar",
     "ledger": "Buxgalteriya",
     "auditLogs": "Audit jurnali",
-    "notifications": "Bildirishnomalar"
+    "notifications": "Bildirishnomalar",
+    "floors": "Qavatlar"
   },
   "hotels": {
     "title": "Mehmonxonalar",
@@ -333,8 +334,29 @@
     "notSelected": "Tanlanmagan"
   },
   "calendar": {
-    "months": ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"],
-    "weekDays": ["Du", "Se", "Ch", "Pa", "Ju", "Sh", "Ya"],
+    "months": [
+      "Yanvar",
+      "Fevral",
+      "Mart",
+      "Aprel",
+      "May",
+      "Iyun",
+      "Iyul",
+      "Avgust",
+      "Sentabr",
+      "Oktabr",
+      "Noyabr",
+      "Dekabr"
+    ],
+    "weekDays": [
+      "Du",
+      "Se",
+      "Ch",
+      "Pa",
+      "Ju",
+      "Sh",
+      "Ya"
+    ],
     "today": "Bugun",
     "prevMonth": "Oldingi oy",
     "nextMonth": "Keyingi oy"
@@ -387,8 +409,60 @@
     "noEmployees": "Xodimlar topilmadi",
     "permissionsFor": "Ruxsatnomalar",
     "currentlyAssigned": "Hozirda {{count}} ta ruxsatnoma biriktirilgan.",
+    "loadingCurrent": "Joriy ruxsatnomalar yuklanmoqda...",
     "cancel": "Bekor qilish",
-    "savePermissions": "Ruxsatnomalarni saqlash"
+    "savePermissions": "Ruxsatnomalarni saqlash",
+    "templateTitle": "Shablon asosida ruxsat berish",
+    "templateHint": "Lavozimni tanlang — mos ruxsatnomalar avtomatik belgilanadi, so'ng qo'lda tahrirlashingiz mumkin.",
+    "templateCustom": "Maxsus",
+    "permCount": "{{count}} ta ruxsatnoma",
+    "selectAll": "Barchasini tanlash",
+    "clearAll": "Tozalash",
+    "selectedCount": "{{count}} / {{total}} tanlandi",
+    "modules": {
+      "reservation": "Bandlash",
+      "guest": "Mehmonlar",
+      "room": "Xonalar",
+      "housekeeping": "Tozalash xizmati",
+      "finance": "Moliya",
+      "report": "Hisobotlar",
+      "employee": "Xodimlar",
+      "service": "Xizmatlar"
+    },
+    "templates": {
+      "housekeeper": {
+        "name": "Farrosh",
+        "description": "Xonalarni tozalash va holatini yangilash"
+      },
+      "housekeepingLead": {
+        "name": "Xo'jalik bo'limi boshlig'i",
+        "description": "Tozalash vazifalarini yaratish va xodimlarga taqsimlash"
+      },
+      "receptionist": {
+        "name": "Qabulxona xodimi",
+        "description": "Bandlash, mehmonlar, kirish-chiqish va to'lovlar"
+      },
+      "manager": {
+        "name": "Menejer",
+        "description": "Kundalik operatsiyalar, moliya va xodimlarni boshqarish"
+      },
+      "accountant": {
+        "name": "Buxgalter",
+        "description": "Hisob-fakturalar, to'lovlar va moliyaviy hisobotlar"
+      },
+      "maintenance": {
+        "name": "Texnik xizmat",
+        "description": "Ta'mirlash vazifalari va xona holatini yangilash"
+      },
+      "viewer": {
+        "name": "Faqat ko'rish",
+        "description": "Barcha bo'limlarni o'zgartirishsiz ko'rish"
+      },
+      "fullAccess": {
+        "name": "To'liq huquq",
+        "description": "Barcha modullar bo'yicha cheklovsiz ruxsat"
+      }
+    }
   },
   "services": {
     "title": "Xizmatlar",
@@ -502,9 +576,9 @@
       "dueDate": "To'lov muddati",
       "notes": "Izohlar",
       "hotelRequired": "Mehmonxona ID kiritilishi shart",
-    "selectHotel": "Mehmonxonani tanlang...",
-    "selectBranch": "Filialni tanlang...",
-    "uuid": "UUID",
+      "selectHotel": "Mehmonxonani tanlang...",
+      "selectBranch": "Filialni tanlang...",
+      "uuid": "UUID",
       "cancel": "Bekor qilish",
       "create": "Yaratish",
       "invoice": "Hisob-faktura",
@@ -635,5 +709,22 @@
     "TURN_DOWN": "Kechki tayyorlov",
     "OCCUPANCY": "Bandlik",
     "REVENUE": "Daromad"
+  },
+  "floors": {
+    "title": "Qavatlar",
+    "subtitle": "Filial qavatlarini boshqarish",
+    "selectBranch": "Filialni tanlang",
+    "branch": "Filial",
+    "floorNumber": "Qavat raqami",
+    "floorName": "Qavat nomi",
+    "floorNamePlaceholder": "Masalan: Yerto'la, Lobbi",
+    "addFloor": "Qavat qo'shish",
+    "editFloor": "Qavatni tahrirlash",
+    "newFloor": "Yangi qavat",
+    "deleteConfirmNum": "{{num}}-qavatni o'chirasizmi?",
+    "noFloors": "Bu filialda qavatlar yo'q",
+    "noBranches": "Filiallar topilmadi",
+    "floorNumberRequired": "Qavat raqami kiritilishi shart",
+    "selectBranchFirst": "Qavatlarni ko'rish uchun avval filialni tanlang"
   }
 }

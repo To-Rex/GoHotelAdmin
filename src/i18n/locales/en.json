@@ -67,7 +67,8 @@
     "payments": "Payments",
     "ledger": "Ledger",
     "auditLogs": "Audit Logs",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "floors": "Floors"
   },
   "hotels": {
     "title": "Hotels",
@@ -333,8 +334,29 @@
     "notSelected": "Not selected"
   },
   "calendar": {
-    "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    "weekDays": ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "weekDays": [
+      "Mo",
+      "Tu",
+      "We",
+      "Th",
+      "Fr",
+      "Sa",
+      "Su"
+    ],
     "today": "Today",
     "prevMonth": "Previous month",
     "nextMonth": "Next month"
@@ -387,8 +409,60 @@
     "noEmployees": "No employees found",
     "permissionsFor": "Permissions",
     "currentlyAssigned": "Currently has {{count}} permission(s) assigned.",
+    "loadingCurrent": "Loading current permissions...",
     "cancel": "Cancel",
-    "savePermissions": "Save Permissions"
+    "savePermissions": "Save Permissions",
+    "templateTitle": "Grant by template",
+    "templateHint": "Pick a role — matching permissions get checked automatically, then fine-tune by hand.",
+    "templateCustom": "Custom",
+    "permCount": "{{count}} permissions",
+    "selectAll": "Select all",
+    "clearAll": "Clear",
+    "selectedCount": "{{count}} / {{total}} selected",
+    "modules": {
+      "reservation": "Reservations",
+      "guest": "Guests",
+      "room": "Rooms",
+      "housekeeping": "Housekeeping",
+      "finance": "Finance",
+      "report": "Reports",
+      "employee": "Employees",
+      "service": "Services"
+    },
+    "templates": {
+      "housekeeper": {
+        "name": "Housekeeper",
+        "description": "Clean rooms and update their status"
+      },
+      "housekeepingLead": {
+        "name": "Housekeeping supervisor",
+        "description": "Create cleaning tasks and assign them to staff"
+      },
+      "receptionist": {
+        "name": "Receptionist",
+        "description": "Reservations, guests, check-in/out and payments"
+      },
+      "manager": {
+        "name": "Manager",
+        "description": "Daily operations, finance and staff management"
+      },
+      "accountant": {
+        "name": "Accountant",
+        "description": "Invoices, payments and financial reports"
+      },
+      "maintenance": {
+        "name": "Maintenance",
+        "description": "Repair tasks and room status updates"
+      },
+      "viewer": {
+        "name": "Read only",
+        "description": "View every section without making changes"
+      },
+      "fullAccess": {
+        "name": "Full access",
+        "description": "Unrestricted access to all modules"
+      }
+    }
   },
   "services": {
     "title": "Services",
@@ -502,9 +576,9 @@
       "dueDate": "Due Date",
       "notes": "Notes",
       "hotelRequired": "Hotel ID is required",
-    "selectHotel": "Select hotel...",
-    "selectBranch": "Select branch...",
-    "uuid": "UUID",
+      "selectHotel": "Select hotel...",
+      "selectBranch": "Select branch...",
+      "uuid": "UUID",
       "cancel": "Cancel",
       "create": "Create",
       "invoice": "Invoice",
@@ -635,5 +709,22 @@
     "TURN_DOWN": "Turn Down",
     "OCCUPANCY": "Occupancy",
     "REVENUE": "Revenue"
+  },
+  "floors": {
+    "title": "Floors",
+    "subtitle": "Manage branch floors",
+    "selectBranch": "Select branch",
+    "branch": "Branch",
+    "floorNumber": "Floor number",
+    "floorName": "Floor name",
+    "floorNamePlaceholder": "e.g. Basement, Lobby",
+    "addFloor": "Add floor",
+    "editFloor": "Edit floor",
+    "newFloor": "New floor",
+    "deleteConfirmNum": "Delete floor {{num}}?",
+    "noFloors": "No floors in this branch",
+    "noBranches": "No branches found",
+    "floorNumberRequired": "Floor number is required",
+    "selectBranchFirst": "Select a branch to view its floors"
   }
 }

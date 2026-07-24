@@ -27,10 +27,12 @@ import type { Hotel } from "@/types/hotel"
 import { formatDate } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { useScope } from "@/hooks/useScope"
+import { usePermissions } from "@/lib/permissions"
 
 export function GuestsPage() {
   const { t } = useTranslation()
   const { scopeMerge, isSuperAdmin, hotelId } = useScope()
+  const { can } = usePermissions()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
@@ -184,19 +186,23 @@ export function GuestsPage() {
       header: "",
       render: (g) => (
         <div className="flex gap-1">
-          <Button variant="ghost" size="sm" onClick={() => openEdit(g)}>
-            {t("guests.edit")}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-red-600"
-            onClick={() => {
-              if (confirm(t("guests.deleteConfirm"))) deleteMutation.mutate(g.id)
-            }}
-          >
-            {t("guests.delete")}
-          </Button>
+          {can("guest.update") && (
+            <Button variant="ghost" size="sm" onClick={() => openEdit(g)}>
+              {t("guests.edit")}
+            </Button>
+          )}
+          {can("guest.delete") && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-red-600"
+              onClick={() => {
+                if (confirm(t("guests.deleteConfirm"))) deleteMutation.mutate(g.id)
+              }}
+            >
+              {t("guests.delete")}
+            </Button>
+          )}
         </div>
       ),
     },
@@ -211,10 +217,12 @@ export function GuestsPage() {
           <h1 className="text-2xl font-bold text-gray-900">{t("guests.title")}</h1>
           <p className="text-gray-500 mt-1">{t("guests.subtitle")}</p>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="h-4 w-4" />
-          {t("guests.addGuest")}
-        </Button>
+        {can("guest.create") && (
+          <Button onClick={openCreate}>
+            <Plus className="h-4 w-4" />
+            {t("guests.addGuest")}
+          </Button>
+        )}
       </div>
 
       <Card>

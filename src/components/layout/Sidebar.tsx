@@ -16,11 +16,13 @@ import {
   BarChart3,
   ClipboardList,
   Package,
+  Layers,
   ChevronLeft,
   ChevronRight,
   PanelLeft,
 } from "lucide-react"
 import { useAuthStore } from "@/store/auth"
+import { usePermissions } from "@/lib/permissions"
 import { useTranslation } from "react-i18next"
 
 interface SidebarProps {
@@ -31,11 +33,10 @@ interface SidebarProps {
 export function Sidebar({ collapsed, onCollapsedChange }: SidebarProps) {
   const location = useLocation()
   const user = useAuthStore((s) => s.user)
+  const { canRoute } = usePermissions()
   const { t } = useTranslation()
 
-  const isSuperAdmin = user?.user_type === "SUPER_ADMIN"
-
-  const navigation = [
+  const allNavigation = [
     {
       section: t("sidebar.main"),
       items: [
@@ -49,6 +50,7 @@ export function Sidebar({ collapsed, onCollapsedChange }: SidebarProps) {
       items: [
         { name: t("sidebar.rooms"), href: "/rooms", icon: DoorOpen },
         { name: t("sidebar.roomTypes"), href: "/room-types", icon: Package },
+        { name: t("sidebar.floors"), href: "/floors", icon: Layers },
         { name: t("sidebar.amenities"), href: "/amenities", icon: Package },
         { name: t("sidebar.guests"), href: "/guests", icon: Users },
         { name: t("sidebar.reservations"), href: "/reservations", icon: CalendarCheck },
@@ -76,13 +78,17 @@ export function Sidebar({ collapsed, onCollapsedChange }: SidebarProps) {
       section: t("sidebar.reports"),
       items: [
         { name: t("sidebar.reports"), href: "/reports", icon: BarChart3 },
-        ...(isSuperAdmin
-          ? [{ name: t("sidebar.auditLogs"), href: "/audit-logs", icon: ClipboardList }]
-          : []),
+        { name: t("sidebar.auditLogs"), href: "/audit-logs", icon: ClipboardList },
         { name: t("sidebar.notifications"), href: "/notifications", icon: Bell },
       ],
     },
   ]
+
+  // Har bir element foydalanuvchi ruxsatiga (canRoute) mos bo'lsagina ko'rinadi;
+  // bo'sh qolgan bo'limlar butunlay yashiriladi. (audit-logs/hotels — SUPER_ADMIN)
+  const navigation = allNavigation
+    .map((group) => ({ ...group, items: group.items.filter((item) => canRoute(item.href)) }))
+    .filter((group) => group.items.length > 0)
 
   const initials = user
     ? `${user.first_name[0]}${user.last_name[0]}`.toUpperCase()

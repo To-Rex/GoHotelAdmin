@@ -39,10 +39,15 @@ import { formatCurrency, cn } from "@/lib/utils"
 import { extractItems } from "@/lib/form"
 import { useTranslation } from "react-i18next"
 import { useScope } from "@/hooks/useScope"
+import { usePermissions } from "@/lib/permissions"
 
 export function ServicesPage() {
   const { t } = useTranslation()
   const { scopeMerge, isSuperAdmin, hotelId } = useScope()
+  const { can } = usePermissions()
+  const canServiceCreate = can("service.create")
+  const canServiceEdit = can("service.update")
+  const canHotelSvc = can("hotel_service.manage")
   const queryClient = useQueryClient()
   const [serviceModal, setServiceModal] = useState(false)
   const [editingService, setEditingService] = useState<Service | null>(null)
@@ -228,11 +233,12 @@ export function ServicesPage() {
     {
       key: "actions",
       header: "",
-      render: (s) => (
-        <Button variant="ghost" size="sm" onClick={() => openServiceEdit(s)}>
-          {t("services.edit")}
-        </Button>
-      ),
+      render: (s) =>
+        canServiceEdit ? (
+          <Button variant="ghost" size="sm" onClick={() => openServiceEdit(s)}>
+            {t("services.edit")}
+          </Button>
+        ) : null,
     },
   ]
 
@@ -255,23 +261,24 @@ export function ServicesPage() {
     {
       key: "actions",
       header: "",
-      render: (hs) => (
-        <div className="flex gap-1">
-          <Button variant="ghost" size="sm" onClick={() => openHotelSvcEdit(hs)}>
-            {t("services.edit")}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-red-600"
-            onClick={() => {
-              if (confirm(t("services.deleteConfirm"))) deleteHotelSvcMutation.mutate(hs.id)
-            }}
-          >
-            {t("services.delete")}
-          </Button>
-        </div>
-      ),
+      render: (hs) =>
+        canHotelSvc ? (
+          <div className="flex gap-1">
+            <Button variant="ghost" size="sm" onClick={() => openHotelSvcEdit(hs)}>
+              {t("services.edit")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-red-600"
+              onClick={() => {
+                if (confirm(t("services.deleteConfirm"))) deleteHotelSvcMutation.mutate(hs.id)
+              }}
+            >
+              {t("services.delete")}
+            </Button>
+          </div>
+        ) : null,
     },
   ]
 
@@ -288,10 +295,12 @@ export function ServicesPage() {
         <Card>
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900">{t("services.globalServices")}</h3>
-            <Button size="sm" onClick={openServiceCreate}>
-              <Plus className="h-4 w-4" />
-              {t("services.add")}
-            </Button>
+            {canServiceCreate && (
+              <Button size="sm" onClick={openServiceCreate}>
+                <Plus className="h-4 w-4" />
+                {t("services.add")}
+              </Button>
+            )}
           </div>
           <CardContent className="pt-6">
             <DataTable
@@ -307,10 +316,12 @@ export function ServicesPage() {
           <Card>
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900">{t("services.hotelServices")}</h3>
-              <Button size="sm" onClick={() => openHotelSvcCreate()}>
-                <Plus className="h-4 w-4" />
-                {t("services.add")}
-              </Button>
+              {canHotelSvc && (
+                <Button size="sm" onClick={() => openHotelSvcCreate()}>
+                  <Plus className="h-4 w-4" />
+                  {t("services.add")}
+                </Button>
+              )}
             </div>
             <CardContent className="pt-4">
               {hotelTree.length === 0 ? (
@@ -343,17 +354,19 @@ export function ServicesPage() {
                           <span className="text-xs text-gray-400 shrink-0">
                             {hotelSvcs.length} {t("services.services", "services")}
                           </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              if (!isExpanded) toggleHotel(hotel.id)
-                              openHotelSvcCreate(hotel.id)
-                            }}
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                          </Button>
+                          {canHotelSvc && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                if (!isExpanded) toggleHotel(hotel.id)
+                                openHotelSvcCreate(hotel.id)
+                              }}
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
                         </button>
 
                         {isExpanded && (
@@ -379,20 +392,24 @@ export function ServicesPage() {
                                   <Badge variant={hs.is_active ? "ACTIVE" : "INACTIVE"} />
                                 </span>
                                 <span className="col-span-4 flex gap-1 justify-end">
-                                  <Button variant="ghost" size="sm" onClick={() => openHotelSvcEdit(hs)}>
-                                    {t("services.edit")}
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-red-600"
-                                    onClick={() => {
-                                      if (confirm(t("services.deleteConfirm")))
-                                        deleteHotelSvcMutation.mutate(hs.id)
-                                    }}
-                                  >
-                                    {t("services.delete")}
-                                  </Button>
+                                  {canHotelSvc && (
+                                    <>
+                                      <Button variant="ghost" size="sm" onClick={() => openHotelSvcEdit(hs)}>
+                                        {t("services.edit")}
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-red-600"
+                                        onClick={() => {
+                                          if (confirm(t("services.deleteConfirm")))
+                                            deleteHotelSvcMutation.mutate(hs.id)
+                                        }}
+                                      >
+                                        {t("services.delete")}
+                                      </Button>
+                                    </>
+                                  )}
                                 </span>
                               </div>
                             ))}
@@ -409,10 +426,12 @@ export function ServicesPage() {
           <Card>
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900">{t("services.hotelServices")}</h3>
-              <Button size="sm" onClick={() => openHotelSvcCreate()}>
-                <Plus className="h-4 w-4" />
-                {t("services.add")}
-              </Button>
+              {canHotelSvc && (
+                <Button size="sm" onClick={() => openHotelSvcCreate()}>
+                  <Plus className="h-4 w-4" />
+                  {t("services.add")}
+                </Button>
+              )}
             </div>
             <CardContent className="pt-6">
               <DataTable

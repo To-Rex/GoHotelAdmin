@@ -22,10 +22,12 @@ import type { Report, ReportGenerateRequest } from "@/types/other"
 import { formatDate, cn } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { useScope } from "@/hooks/useScope"
+import { usePermissions } from "@/lib/permissions"
 
 export function ReportsPage() {
   const { t } = useTranslation()
   const { scopeMerge, isSuperAdmin, hotelId } = useScope()
+  const { can } = usePermissions()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
@@ -132,7 +134,9 @@ export function ReportsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div><h1 className="text-2xl font-bold text-gray-900">{t("reports.title")}</h1><p className="text-gray-500 mt-1">{t("reports.subtitle")}</p></div>
-        <Button onClick={() => openCreate()}><Plus className="h-4 w-4" />{t("reports.generateReport")}</Button>
+        {can("report.generate") && (
+          <Button onClick={() => openCreate()}><Plus className="h-4 w-4" />{t("reports.generateReport")}</Button>
+        )}
       </div>
 
       {isSuperAdmin ? (
@@ -152,7 +156,9 @@ export function ReportsPage() {
                     <Building2 className="h-5 w-5 text-primary-600 shrink-0" />
                     <div className="flex-1 min-w-0"><span className="font-semibold text-gray-900">{hotel.name}</span>{hotel.code && <span className="text-xs text-gray-400 ml-2">({hotel.code})</span>}</div>
                     <span className="text-xs text-gray-400 shrink-0">{hotelReports.length} {t("reports.title")}</span>
-                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); if (!isExpanded) toggleHotel(hotel.id); openCreate(hotel.id) }}><Plus className="h-3.5 w-3.5" /></Button>
+                    {can("report.generate") && (
+                      <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); if (!isExpanded) toggleHotel(hotel.id); openCreate(hotel.id) }}><Plus className="h-3.5 w-3.5" /></Button>
+                    )}
                   </button>
                   {isExpanded && (
                     <div className="border-t border-gray-100">

@@ -32,10 +32,12 @@ import type { Hotel } from "@/types/hotel"
 import { formatDate, cn } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { useScope } from "@/hooks/useScope"
+import { usePermissions } from "@/lib/permissions"
 
 export function RoomsPage() {
   const { t } = useTranslation()
   const { scopeMerge, isSuperAdmin, hotelId, branchId } = useScope()
+  const { can } = usePermissions()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [expandedHotels, setExpandedHotels] = useState<Set<string>>(new Set())
@@ -382,10 +384,12 @@ export function RoomsPage() {
           <h1 className="text-2xl font-bold text-gray-900">{t("rooms.title")}</h1>
           <p className="text-gray-500 mt-1">{t("rooms.subtitle")}</p>
         </div>
-        <Button onClick={() => openCreate()}>
-          <Plus className="h-4 w-4" />
-          {t("rooms.addRoom")}
-        </Button>
+        {can("room.create") && (
+          <Button onClick={() => openCreate()}>
+            <Plus className="h-4 w-4" />
+            {t("rooms.addRoom")}
+          </Button>
+        )}
       </div>
 
       <div className="relative">
@@ -435,18 +439,20 @@ export function RoomsPage() {
                 <span className="text-xs text-gray-400 shrink-0">
                   {branches.length} {t("branches.title")} / {hotelRoomCount} {t("rooms.room")}
                 </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (!isHotelExpanded) toggleHotel(hotel.id)
-                    const firstBranch = branches[0]
-                    openCreate(hotel.id, firstBranch?.id)
-                  }}
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                </Button>
+                {can("room.create") && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (!isHotelExpanded) toggleHotel(hotel.id)
+                      const firstBranch = branches[0]
+                      openCreate(hotel.id, firstBranch?.id)
+                    }}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </Button>
+                )}
               </button>
 
               {isHotelExpanded && (
@@ -480,17 +486,19 @@ export function RoomsPage() {
                               <span className="text-xs text-gray-400 ml-auto shrink-0">
                                 {roomsForBranch.length} {t("rooms.room")}
                               </span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  if (!isBranchExpanded) toggleBranch(branch.id)
-                                  openCreate(hotel.id, branch.id)
-                                }}
-                              >
-                                <Plus className="h-3.5 w-3.5" />
-                              </Button>
+                              {can("room.create") && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    if (!isBranchExpanded) toggleBranch(branch.id)
+                                    openCreate(hotel.id, branch.id)
+                                  }}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              )}
                             </button>
 
                             {isBranchExpanded && (
@@ -533,37 +541,45 @@ export function RoomsPage() {
                                           {room.base_price ? `${room.base_price.toLocaleString()} ${t("common.som")}` : "—"}
                                         </span>
                                         <span className="col-span-2">
-                                          <button
-                                            onClick={(e) => {
-                                              e.stopPropagation()
-                                              setStatusModal(room)
-                                            }}
-                                          >
+                                          {can("room.status.update") ? (
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation()
+                                                setStatusModal(room)
+                                              }}
+                                            >
+                                              <Badge variant={room.current_status} />
+                                            </button>
+                                          ) : (
                                             <Badge variant={room.current_status} />
-                                          </button>
+                                          )}
                                         </span>
                                         <span className="col-span-2 text-xs text-gray-500">
                                           {formatDate(room.created_at)}
                                         </span>
                                         <span className="col-span-2 flex gap-1 justify-end">
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => openEdit(room)}
-                                          >
-                                            {t("rooms.edit")}
-                                          </Button>
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="text-red-600"
-                                            onClick={() => {
-                                              if (confirm(t("rooms.deleteConfirm")))
-                                                deleteMutation.mutate(room.id)
-                                            }}
-                                          >
-                                            {t("rooms.delete")}
-                                          </Button>
+                                          {can("room.update") && (
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              onClick={() => openEdit(room)}
+                                            >
+                                              {t("rooms.edit")}
+                                            </Button>
+                                          )}
+                                          {can("room.delete") && (
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              className="text-red-600"
+                                              onClick={() => {
+                                                if (confirm(t("rooms.deleteConfirm")))
+                                                  deleteMutation.mutate(room.id)
+                                              }}
+                                            >
+                                              {t("rooms.delete")}
+                                            </Button>
+                                          )}
                                         </span>
                                       </div>
                                     ))}

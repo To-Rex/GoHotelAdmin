@@ -3,6 +3,18 @@ import { persist } from "zustand/middleware"
 import type { UserProfile } from "@/types/auth"
 import * as authApi from "@/api/modules/auth"
 
+// Admin panelga kirishga kim ruxsat etiladi:
+//  - SUPER_ADMIN (barcha mehmonxonalar)
+//  - ADMIN (o'z mehmonxonasida to'liq)
+//  - EMPLOYEE — kamida bitta ruxsatga ega bo'lsa (manager/reception)
+// (aylanma importdan qochish uchun bu yerda inline, permissions.ts bilan bir xil qoida)
+function isAllowedInAdminPanel(u: UserProfile | null | undefined): boolean {
+  if (!u) return false
+  if (u.user_type === "SUPER_ADMIN" || u.user_type === "ADMIN") return true
+  if (u.user_type === "EMPLOYEE") return (u.permissions?.length || 0) > 0
+  return false
+}
+
 interface AuthState {
   token: string | null
   refreshToken: string | null
@@ -51,8 +63,8 @@ export const useAuthStore = create<AuthState>()(
           }
         }
 
-        // only SUPER_ADMIN is allowed into the admin panel
-        if (!user || user.user_type !== "SUPER_ADMIN") {
+        // SUPER_ADMIN, ADMIN va ruxsatli EMPLOYEE (manager) kirishi mumkin
+        if (!isAllowedInAdminPanel(user)) {
           try {
             await authApi.logout()
           } catch {
@@ -97,7 +109,7 @@ export const useAuthStore = create<AuthState>()(
       fetchProfile: async () => {
         try {
           const user = await authApi.getMe()
-          if (user.user_type !== "SUPER_ADMIN") {
+          if (!isAllowedInAdminPanel(user)) {
             get().clearAuth()
             return
           }
@@ -120,7 +132,7 @@ export const useAuthStore = create<AuthState>()(
         }
         try {
           const user = await authApi.getMe()
-          if (user.user_type !== "SUPER_ADMIN") {
+          if (!isAllowedInAdminPanel(user)) {
             set({
               token: null,
               refreshToken: null,

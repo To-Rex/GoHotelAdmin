@@ -31,6 +31,7 @@ import { getRooms, getRoomTypes } from "@/api/modules/rooms"
 import { getGuests, createGuest } from "@/api/modules/guests"
 import { Button, Input, Modal, Spinner } from "@/components/ui"
 import { useScope } from "@/hooks/useScope"
+import { usePermissions } from "@/lib/permissions"
 import { cn } from "@/lib/utils"
 import type { Reservation } from "@/types/reservation"
 import type { Room } from "@/types/room"
@@ -54,6 +55,7 @@ export function BookingPage() {
   const { t } = useTranslation()
   const weekDays = t("calendar.weekDays", { returnObjects: true }) as string[]
   const { scopeMerge, hotelId, branchId } = useScope()
+  const { can } = usePermissions()
   const queryClient = useQueryClient()
 
   const [currentMonth, setCurrentMonth] = useState(new Date())
@@ -416,14 +418,16 @@ export function BookingPage() {
               </button>
             </div>
           )}
-          <Button
-            onClick={openBookingModal}
-            disabled={!selectedRoom || !selectionStart || !selectionEnd}
-            className="disabled:opacity-100 disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none"
-          >
-            <Plus className="h-4 w-4" />
-            {t("booking.newBooking")}
-          </Button>
+          {can("reservation.create") && (
+            <Button
+              onClick={openBookingModal}
+              disabled={!selectedRoom || !selectionStart || !selectionEnd}
+              className="disabled:opacity-100 disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none"
+            >
+              <Plus className="h-4 w-4" />
+              {t("booking.newBooking")}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -668,14 +672,16 @@ export function BookingPage() {
           <Button variant="secondary" onClick={clearSelection} disabled={!selectedRoom}>
             {t("booking.cancel")}
           </Button>
-          <Button
-            onClick={openBookingModal}
-            disabled={!selectedRoom || !selectionStart || !selectionEnd}
-            className="disabled:opacity-100 disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none"
-          >
-            <CheckCircle2 className="h-4 w-4" />
-            {t("booking.confirm")}
-          </Button>
+          {can("reservation.create") && (
+            <Button
+              onClick={openBookingModal}
+              disabled={!selectedRoom || !selectionStart || !selectionEnd}
+              className="disabled:opacity-100 disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none"
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              {t("booking.confirm")}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -895,9 +901,11 @@ export function BookingPage() {
             >
               {t("booking.cancel")}
             </Button>
-            <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending ? t("booking.booking") : t("booking.bookNow")}
-            </Button>
+            {can("reservation.create") && (
+              <Button type="submit" disabled={createMutation.isPending}>
+                {createMutation.isPending ? t("booking.booking") : t("booking.bookNow")}
+              </Button>
+            )}
           </div>
         </form>
       </Modal>

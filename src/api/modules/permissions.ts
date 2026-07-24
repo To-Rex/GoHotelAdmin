@@ -1,5 +1,5 @@
 import api from "@/api/client"
-import type { Permission, UserPermission } from "@/types/auth"
+import type { Permission } from "@/types/auth"
 
 export async function getPermissions(): Promise<Permission[]> {
   const res = await api.get("/permissions")
@@ -11,11 +11,11 @@ export async function getPermissionModules(): Promise<string[]> {
   return res.data
 }
 
-export async function getUserPermissions(
-  userId: string
-): Promise<UserPermission[]> {
+export async function getUserPermissions(userId: string): Promise<Permission[]> {
   const res = await api.get(`/permissions/${userId}/permissions`)
-  return res.data
+  const data = res.data
+  if (Array.isArray(data)) return data
+  return data?.permissions ?? []
 }
 
 export async function setUserPermissions(
@@ -25,6 +25,24 @@ export async function setUserPermissions(
   await api.put(`/permissions/${userId}/permissions`, {
     permission_ids: permissionIds,
   })
+}
+
+/**
+ * Replace a user's permissions. The bulk endpoint rejects an empty list, so
+ * clearing everything falls back to revoking the currently granted ones.
+ */
+export async function syncUserPermissions(
+  userId: string,
+  permissionIds: string[],
+  currentIds: string[] = []
+): Promise<void> {
+  if (permissionIds.length > 0) {
+    await setUserPermissions(userId, permissionIds)
+    return
+  }
+  for (const id of currentIds) {
+    await revokePermission(userId, id)
+  }
 }
 
 export async function grantPermission(

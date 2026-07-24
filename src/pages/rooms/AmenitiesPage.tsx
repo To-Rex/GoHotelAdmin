@@ -21,11 +21,14 @@ import {
 } from "@/api/modules/amenities"
 import type { Amenity } from "@/types/room"
 import { useScope } from "@/hooks/useScope"
+import { usePermissions } from "@/lib/permissions"
 import { useTranslation } from "react-i18next"
 
 export function AmenitiesPage() {
   const { t } = useTranslation()
   const { isSuperAdmin } = useScope()
+  const { can } = usePermissions()
+  const canManage = can("room.manage")
 
   const ICON_OPTIONS = [
     { value: "", label: t("amenities.icons.none") },
@@ -132,7 +135,7 @@ export function AmenitiesPage() {
             {isSuperAdmin ? t("amenities.subtitleGlobal") : t("amenities.subtitle")}
           </p>
         </div>
-        {isSuperAdmin && (
+        {canManage && (
           <Button onClick={openCreate}>
             <Plus className="h-4 w-4" />
             {t("amenities.newAmenity")}
@@ -168,7 +171,7 @@ export function AmenitiesPage() {
                   <Badge variant={a.is_active ? "ACTIVE" : "INACTIVE"} />
                 </div>
               </div>
-              {isSuperAdmin && (
+              {canManage && (
                 <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
                   <Button
                     variant="ghost"

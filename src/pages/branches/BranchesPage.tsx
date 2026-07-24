@@ -23,10 +23,12 @@ import type { Branch, BranchCreateRequest, BranchUpdateRequest } from "@/types/b
 import { formatDate, cn } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { useScope } from "@/hooks/useScope"
+import { usePermissions } from "@/lib/permissions"
 
 export function BranchesPage() {
   const { t } = useTranslation()
   const { scopeMerge, isSuperAdmin, hotelId } = useScope()
+  const { can } = usePermissions()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [expandedHotels, setExpandedHotels] = useState<Set<string>>(new Set())
@@ -174,10 +176,12 @@ export function BranchesPage() {
           <h1 className="text-2xl font-bold text-gray-900">{t("branches.title")}</h1>
           <p className="text-gray-500 mt-1">{t("branches.subtitle")}</p>
         </div>
-        <Button onClick={() => openCreate()}>
-          <Plus className="h-4 w-4" />
-          {t("branches.addBranch")}
-        </Button>
+        {can("branch.create") && (
+          <Button onClick={() => openCreate()}>
+            <Plus className="h-4 w-4" />
+            {t("branches.addBranch")}
+          </Button>
+        )}
       </div>
 
       <div className="relative">
@@ -223,17 +227,19 @@ export function BranchesPage() {
                 <span className="text-xs text-gray-400 shrink-0">
                   {branches.length} {t("branches.title")}
                 </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (!isExpanded) toggleHotel(hotel.id)
-                    openCreate(hotel.id)
-                  }}
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                </Button>
+                {can("branch.create") && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (!isExpanded) toggleHotel(hotel.id)
+                      openCreate(hotel.id)
+                    }}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </Button>
+                )}
               </button>
 
               {isExpanded && (
@@ -284,13 +290,15 @@ export function BranchesPage() {
                             {formatDate(branch.created_at)}
                           </span>
                           <span className="col-span-1 flex justify-end">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => openEdit(branch)}
-                            >
-                              {t("branches.edit")}
-                            </Button>
+                            {can("branch.update") && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => openEdit(branch)}
+                              >
+                                {t("branches.edit")}
+                              </Button>
+                            )}
                           </span>
                         </div>
                       ))}

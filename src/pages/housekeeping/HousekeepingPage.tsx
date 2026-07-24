@@ -30,6 +30,7 @@ import { getEmployees } from "@/api/modules/employees"
 import { formatDate, cn } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { useScope } from "@/hooks/useScope"
+import { usePermissions } from "@/lib/permissions"
 
 function PhotoImage({ taskId, photoId, fileName }: { taskId: string; photoId: string; fileName: string }) {
   const [src, setSrc] = useState<string | null>(null)
@@ -58,6 +59,7 @@ function PhotoImage({ taskId, photoId, fileName }: { taskId: string; photoId: st
 export function HousekeepingPage() {
   const { t } = useTranslation()
   const { scopeMerge, isSuperAdmin, hotelId, branchId } = useScope()
+  const { can } = usePermissions()
   const queryClient = useQueryClient()
   const isFetching = useIsFetching({ queryKey: ["housekeeping"] }) > 0
   const [search, setSearch] = useState("")
@@ -309,10 +311,12 @@ export function HousekeepingPage() {
           >
             <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
           </Button>
-          <Button onClick={() => openCreate()}>
-            <Plus className="h-4 w-4" />
-            {t("housekeeping.newTask")}
-          </Button>
+          {can("housekeeping.task.create") && (
+            <Button onClick={() => openCreate()}>
+              <Plus className="h-4 w-4" />
+              {t("housekeeping.newTask")}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -363,18 +367,20 @@ export function HousekeepingPage() {
                 <span className="text-xs text-gray-400 shrink-0 sm:hidden">
                   {branches.length}b / {totalTasks}t
                 </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (!isHotelExpanded) toggleHotel(hotel.id)
-                    const firstBranch = branches[0]
-                    openCreate(hotel.id, firstBranch?.branch.id)
-                  }}
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                </Button>
+                {can("housekeeping.task.create") && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (!isHotelExpanded) toggleHotel(hotel.id)
+                      const firstBranch = branches[0]
+                      openCreate(hotel.id, firstBranch?.branch.id)
+                    }}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </Button>
+                )}
               </button>
 
               {isHotelExpanded && (
@@ -408,17 +414,19 @@ export function HousekeepingPage() {
                               <span className="text-xs text-gray-400 ml-auto shrink-0">
                                 {branchTasks.length}
                               </span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  if (!isBranchExpanded) toggleBranch(branch.id)
-                                  openCreate(hotel.id, branch.id)
-                                }}
-                              >
-                                <Plus className="h-3.5 w-3.5" />
-                              </Button>
+                              {can("housekeeping.task.create") && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    if (!isBranchExpanded) toggleBranch(branch.id)
+                                    openCreate(hotel.id, branch.id)
+                                  }}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              )}
                             </button>
 
                             {isBranchExpanded && (
@@ -477,13 +485,15 @@ export function HousekeepingPage() {
                                                 </span>
                                               )}
                                             </Button>
-                                            <Button
-                                              variant="ghost"
-                                              size="sm"
-                                              onClick={() => setAssignModal(task)}
-                                            >
-                                              {t("housekeeping.assign")}
-                                            </Button>
+                                            {can("housekeeping.task.assign") && (
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setAssignModal(task)}
+                                              >
+                                                {t("housekeeping.assign")}
+                                              </Button>
+                                            )}
                                           </div>
                                         </div>
 
@@ -511,7 +521,8 @@ export function HousekeepingPage() {
                                           <span className="text-gray-500">{t("housekeeping.status")}:</span>
                                           <div className="flex items-center gap-1">
                                             <Badge variant={task.status} />
-                                            {(task.status === "OPEN" || task.status === "IN_PROGRESS") && (
+                                            {can("housekeeping.task.update") &&
+                                              (task.status === "OPEN" || task.status === "IN_PROGRESS") && (
                                               <select
                                                 className="text-xs border rounded px-1 py-0.5"
                                                 value=""
@@ -544,7 +555,8 @@ export function HousekeepingPage() {
 
                                         <span className="hidden md:flex col-span-2 items-center gap-1.5">
                                           <Badge variant={task.status} className="text-[10px] px-2 py-0.5" />
-                                          {(task.status === "OPEN" || task.status === "IN_PROGRESS") && (
+                                          {can("housekeeping.task.update") &&
+                                            (task.status === "OPEN" || task.status === "IN_PROGRESS") && (
                                             <select
                                               className="text-[11px] border border-gray-200 rounded-md px-1.5 py-0.5 bg-white hover:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 cursor-pointer text-gray-500"
                                               value=""
@@ -617,14 +629,16 @@ export function HousekeepingPage() {
                                               )}
                                             </div>
                                           </button>
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="text-xs"
-                                            onClick={() => setAssignModal(task)}
-                                          >
-                                            {t("housekeeping.assign")}
-                                          </Button>
+                                          {can("housekeeping.task.assign") && (
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              className="text-xs"
+                                              onClick={() => setAssignModal(task)}
+                                            >
+                                              {t("housekeeping.assign")}
+                                            </Button>
+                                          )}
                                         </span>
                                       </div>
                                     ))}
